@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost - Your AI Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #FFFFFF;
+    }
+
+    #response {
+      margin-top: 20px;
+      font-size: 10px;
+      color: #000000;
+      text-align: center;
+    }
+    #head {
+      margin-top: 20px;
+      font-size: 50px;
+      color: #000000;
+      text-align: top;
+      font-weight: 500;
+    }
+    title {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #6200ea;
+      text-align: center;
+    }
+
+    #shoppingList {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #FFFFFF;
+      text-align: center;
+      white-space: pre-wrap;
+    }
+
+    #timerDisplay {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #FFFFFF;
+      font-weight: normal;
+      display: none;
+    }
+
+    /* Visualizer Canvas Styling */
+    #canvas {
+      margin-top: 40px;
+      background: transparent;
+      border-radius: 50%;
+      border: 0px solid #0000; /* Add border to ensure it's visible */
+    }
+
+  </style>
+</head>
+<body>
+  <div id="head" style="font-weight: bold;">Ghost</div>
+  <div id="response">Listening for "Hey Ghost"</div>
+  <div id="shoppingList"></div>
+  <div id="timerDisplay">Timer: Not active</div>
+  
+  <!-- Canvas for the visualizer -->
+  <canvas id="canvas" width="500" height="500"></canvas>
+
+<script>
+
+
+  //Foxcat Studios - 2024, 2025: Ghost AI
+
+
+  // Declare the responses object here, before the code that handles speech recognition
+  const responses = {
+
+    //System
+    "test": "Ghost A I, and FoxCat Studios 2025, All rights reserved",
+    "reboot": "Ghost A I, and FoxCat Studios 2025, All rights reserved",
+
+    //Random
+    "what is your name": "My name is Ghost, a Virtual assistant.",
+    "how are you": "I'm just a bunch of code, but I'm running smoothly!",
+    "what is roblox": "Roblox is an online game platform that allows users to program and play games created by themselves or others.",
+    "tell me a random fact": "Did you know that honey never spoils? Archaeologists have found pots of honey in ancient tombs that are over 3,000 years old!",
+
+    //Time
+    "what time is it": () => new Date().toLocaleTimeString(),
+    "what is today's date": () => new Date().toLocaleDateString(),
+
+    //Greetings
+    "good morning": "Good morning! Have a great start to your day!",
+    "good night": "Good night! Sleep tight!",
+    "goodbye": "Goodbye! Have a great day!",
+    "hey ghost": "Yes?",
+    "ghost": "Yes?",
+    "i'm sorry i don't understand that": " ",
+    "who is you'r creator": "I was carefully crafted by Roberto Estrada.",
+
+    //Humor
+    "laugh": "hehehehehehehehehe",
+    "what is your favorite movie": "Terminator",
+    "tell me a joke": "Why did the computer go to the doctor? It had a virus!",
+
+
+    //Cooking
+    "tell me a random recipe": "Ok! Here is a recipe for Caprese Salad. Combine 2 large tomatoes, sliced, with 8 oz fresh mozzarella cheese, sliced, in a large bowl. Add a handful of fresh basil leaves, either whole or chopped, and drizzle with 2 tablespoons of extra virgin olive oil and 1 tablespoon of balsamic vinegar. Season with salt and pepper to taste and gently toss the ingredients together. For added flavor, you can sprinkle some balsamic glaze on top. Serve immediately as a refreshing side dish or light appetizer. Enjoy the fresh and vibrant flavors of this simple Italian classic!",
+
+    //Other
+    "can you help me": "Of course! I can help you with a variety of tasks!",
+    "can you play music": "I cannot play music, but I can do many other things!",
+  };
+
+  // Microphone Visualizer Code
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const bufferLength = 256;
+  const dataArray = new Uint8Array(bufferLength);
+  let audioContext, analyser, microphoneSource;
+
+  async function startMicrophone() {
+    try {
+      // Create AudioContext
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      await audioContext.resume();  // Ensure AudioContext is resumed
+
+      // Create an analyser
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 512; // Analyser's FFT size
+
+      // Get the microphone stream
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      microphoneSource = audioContext.createMediaStreamSource(stream);
+      microphoneSource.connect(analyser);  // Connect to the analyser
+
+      animate();  // Start visualizer animation
+    } catch (err) {
+      console.error("Error accessing microphone: ", err);
+    }
+  }
+
+  // Visualizer Animation
+  function animate() {
+    requestAnimationFrame(animate); // Request next frame
+
+    analyser.getByteFrequencyData(dataArray); // Get frequency data
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas for next frame
+    const radius = Math.min(canvas.width, canvas.height) / 4;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    let sum = 0;
+    for (let i = 0; i < bufferLength; i++) {
+      sum += dataArray[i];
+    }
+    const average = sum / bufferLength;
+    const pulseRadius = radius + average / 3; // Pulse based on volume level
+    const opacity = average / 255;  // Opacity based on sound intensity
+
+    // Draw the pulsing circle with a more visible color
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, pulseRadius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;  // Changed color to black                                                    :)))))))
+    ctx.fill();
+  }
+
+  // Button to start the audio context
+  document.addEventListener('click', () => {
+    if (!audioContext) {
+      startMicrophone();  // Start microphone visualizer when clicked
+    }
+  });
+
+  // Speech Recognition for Assistant
+  if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.continuous = true;
+
+    let isActive = false;
+    let commandTimeout;
+
+    let shoppingList = [];
+
+    let reminders = [];
+
+    let timerId = null;
+    let timerDuration = 0;
+    let timerRemaining = 0;
+
+    const triggerWords = ["hey ghost", "ghost"];
+
+    let voices = [];
+    function loadVoices() {
+      voices = speechSynthesis.getVoices();
+    }
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = loadVoices;
+    } else {
+      loadVoices();
+    }
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      utterance.pitch = 1;
+      utterance.rate = 1;
+      const maleVoice = voices.find(voice => voice.name.includes("Male") || voice.name.includes("Google US English Male"));
+      utterance.voice = maleVoice || voices[0];
+      speechSynthesis.speak(utterance);
+    }
+
+    function handleCommand(spokenText) {
+      const responseDiv = document.getElementById("response");
+      let responseText = "I'm sorry, I don't understand that.";
+
+      // Timer Handling
+      if (spokenText.includes("set a timer")) {
+        const timeMatch = spokenText.match(/(\d+)\s*(hour|minute|second)s?/);
+        if (timeMatch) {
+          const value = parseInt(timeMatch[1], 10);
+          const unit = timeMatch[2];
+          if (unit === "hour") {
+            timerDuration = value * 60 * 60;
+          } else if (unit === "minute") {
+            timerDuration = value * 60;
+          } else if (unit === "second") {
+            timerDuration = value;
+          }
+          timerRemaining = timerDuration;
+          startTimer();
+          responseText = `Timer set for ${value} ${unit}${value > 1 ? 's' : ''}.`;
+        } else {
+          responseText = "Sorry, I didn't catch that. Please specify hours, minutes, or seconds.";
+        }
+      } else if (spokenText === "how much time is left on my timer") {
+        responseText = timerRemaining > 0 ? `Time left: ${Math.floor(timerRemaining / 60)} minutes and ${timerRemaining % 60} seconds.` : "The timer has expired!";
+      } else if (spokenText === "cancel the timer" || spokenText === "stop the timer") {
+        clearInterval(timerId);
+        timerId = null;
+        timerRemaining = 0;
+        responseText = "Timer stopped.";
+      }
+
+      // Shopping List Handling
+      else if (spokenText === "what is on my shopping list") {
+        responseText = shoppingList.length > 0 ? "Here is your shopping list: " + shoppingList.join(", ") : "Your shopping list is empty.";
+      } else if (spokenText.startsWith("add ") && spokenText.includes(" to my shopping list")) {
+        const item = spokenText.replace("add ", "").replace(" to my shopping list", "").trim();
+        shoppingList.push(item);
+        responseText = `You added "${item}" to your shopping list.`;
+      } else if (spokenText.startsWith("remove ") && spokenText.includes(" from my shopping list")) {
+        const item = spokenText.replace("remove ", "").replace(" from my shopping list", "").trim();
+        const index = shoppingList.indexOf(item);
+        if (index !== -1) {
+          shoppingList.splice(index, 1);
+          responseText = `You removed "${item}" from your shopping list.`;
+        } else {
+          responseText = `"${item}" is not on your shopping list.`;
+        }
+      }
+      // Reminders handling
+      else if (spokenText === "what are my reminders") {
+        responseText = reminders.length > 0 ? "Here are your reminders: " + reminders.join(", ") : "You have no reminders.";
+      } else if (spokenText.startsWith("add ") && spokenText.includes(" to my reminders")) {
+        const item = spokenText.replace("add ", "").replace(" to my reminders", "").trim();
+        reminders.push(item);
+        responseText = `You added "${item}" to your reminders.`;
+      } else if (spokenText.startsWith("remove ") && spokenText.includes(" from my reminders")) {
+        const item = spokenText.replace("remove ", "").replace(" from my reminders", "").trim();
+        const index = reminders.indexOf(item);
+        if (index !== -1) {
+          reminders.splice(index, 1);
+          responseText = `You removed "${item}" from your reminders.`;
+        } else {
+          responseText = `"${item}" is not on your reminders.`;
+        }
+      }
+      // Image
+      else if (spokenText.startsWith("generate an image of a ")) {
+        const image = spokenText.replace("generate an image of a ", "").trim();
+        responseText = `I cannot generate an image of a ${image} at the moment.`;
+      }
+      else if (spokenText.startsWith("generate an image of an ")) {
+        const image = spokenText.replace("generate an image of an ", "").trim();
+        responseText = `I cannot generate an image of an ${image} at the moment.`;
+      }
+
+      // Answer pre-defined responses
+      else if (responses[spokenText]) {
+        responseText = typeof responses[spokenText] === "function" ? responses[spokenText]() : responses[spokenText];
+      }
+
+      responseDiv.textContent = responseText;
+      speak(responseText);
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(() => {
+        recognition.onresult = (event) => {
+          const spokenText = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+          console.log("Recognized: ", spokenText);
+
+          if (!isActive) {
+            if (triggerWords.includes(spokenText)) {
+              isActive = true;
+              document.getElementById("response").textContent = "Ask a question or command";
+              speak("I'm listening.");
+              clearTimeout(commandTimeout);
+              commandTimeout = setTimeout(() => {
+                isActive = false;
+                document.getElementById("response").textContent = "Listening for 'Hey Ghost'...";
+              }, 10000);
+            }
+          } else {
+            handleCommand(spokenText);
+            clearTimeout(commandTimeout);
+            commandTimeout = setTimeout(() => {
+              isActive = false;
+              document.getElementById("response").textContent = "Listening for 'Hey Ghost'...";
+            }, 10000);
+          }
+        };
+
+        recognition.start();
+      })
+      .catch((error) => {
+        console.error("Microphone access denied:", error);
+        alert("Please allow microphone access to use the assistant.");
+      });
+
+    function startTimer() {
+      if (timerId) clearInterval(timerId);
+      timerId = setInterval(() => {
+        if (timerRemaining > 0) {
+          timerRemaining--;
+          document.getElementById("timerDisplay").textContent = `Timer: ${Math.floor(timerRemaining / 60)} minutes and ${timerRemaining % 60} seconds remaining`;
+        } else {
+          clearInterval(timerId);
+          timerId = null;
+          document.getElementById("timerDisplay").textContent = "Timer finished!";
+          speak("Time's up!");
+        }
+      }, 1000);
+    }
+  } else {
+    alert("Your browser does not support speech recognition. Please use a compatible browser.");
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exxtal Blog | Docs </title>
+  <style>
+    body {
+      margin: 500px;
+      padding: 0;
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+      overflow-x: hidden;
+    }
+
+    /* Header styles */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.9); /* Slight opacity */
+      color: #333;
+      text-align: center;
+      padding: 5px 0;
+      font-size: 1rem;
+      z-index: 100;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    header .company-name {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    /* Navbar container */
+    .navbar {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .navbar-item {
+      position: relative;
+      cursor: pointer;
+      padding: 8px 20px;
+      transition: color 0.3s ease;
+    }
+
+    /* Container for the cards */
+    .content-container {
+      margin-top: 50px; /* Adjust for header height */
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-bottom: 50px; /* To avoid overlap with footer */
+    }
+
+    /* Card styles */
+    .card {
+  display: flex; /* Enables Flexbox */
+  flex-direction: column; /* Stacks content vertically */
+  align-items: center; /* Centers content horizontally */
+  justify-content: flex-start; /* Aligns content at the top */
+  width: 100%; /* Makes sure the card takes full width of its container */
+}
+
+.card_img {
+  width: 35%; /* Makes image fill the container's width */
+  height: fit-content; /* Or use a relative height like 50vh if you prefer */
+  object-fit: cover; /* Ensures image doesn't stretch out */
+  margin-bottom: 10px; /* Adds spacing between image and text */
+}
+
+.dear_echo_header {
+  margin-top: 120px; /* Adjust for header height */
+  display: flex; /* Enables Flexbox */
+  flex-direction: column; /* Stacks content vertically */
+  align-items: center; /* Corrected from 'left' to 'flex-start' */
+  justify-content: flex-start; /* Aligns content at the top */
+  width: 100%; /* Keeps full width */
+  margin-bottom: 5px; /* To avoid overlap with footer */
+}
+
+
+
+.card a {
+      color: #000000;
+      text-decoration: none;
+      display: block;
+      padding: 10px 0;
+      font-size: 20px;
+      transition: background-color 0.2s ease;
+    }
+
+    .card a:hover {
+      color: #16d700;
+    }
+
+    .card p {
+      padding: 0px;
+      font-family: sans-serif;
+      font-size: 12px;
+      color: #c8c8c8;
+      text-align: left;
+      border: none;
+      border-radius: 30px;
+      transition: background-color 0.3s ease;
+      margin-top: 20px; /* Ensure buttons are below the text */
+    }
+
+    .card p:hover {
+      color: #c8c8c8;
+    }
+
+    .card button {
+      padding: 8px 16px;
+      background-color: #355070;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .card button:hover {
+      background-color: #eaac8b;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+      overflow-x: hidden;
+    }
+
+    /* Header styles */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.9); /* Slight opacity */
+      color: #333;
+      text-align: center;
+      padding: 5px 0;
+      font-size: 1rem;
+      z-index: 100;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    header .company-name {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    /* Navbar container */
+    .navbar {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .navbar-item {
+      position: relative;
+      cursor: pointer;
+      padding: 8px 20px;
+      transition: color 0.3s ease;
+    }
+
+    /* Dropdown Menu (Outside of Header) */
+    .dropdown {
+      position: fixed;
+      top: 50px; /* Adjust to align with the header */
+      left: 0;
+      display: none;
+      width: 100vw; /* Full width of the viewport */
+      background-color: #fff; /* White background */
+      color: #000000;
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 200; /* Ensure dropdown is above the header */
+      opacity: 0;
+      transform: translateY(-20px); /* Start position for smoother animation */
+      animation: dropdown 0.4s ease forwards; /* Smooth animation */
+    }
+
+    /* Hover effect for dropdown */
+    @keyframes dropdown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .dropdown a {
+      color: #000000;
+      text-decoration: none;
+      display: block;
+      padding: 10px 0;
+      font-size: 20px;
+      transition: background-color 0.2s ease;
+    }
+
+    .dropdown a:hover {
+      background-color: #ffffff;
+    }
+
+    /* Add hover effect for blur on background */
+    header.active {
+      background-color: rgba(255, 255, 255, 1); /* Full opacity on hover */
+      backdrop-filter: blur(8px); /* Apply stronger blur effect */
+    }
+
+    /* Container for the entire website to handle scrolling */
+    .content-container {
+      margin-top: 120px;
+    }
+
+    /* Banner and product section */
+    .banner {
+      position: relative;
+      text-align: center;
+      background-color: transparent;
+      color: #fff;
+      padding: 100px 0;
+      margin-top: 0%;
+      transition: all 0.3s ease;
+    }
+
+    .banner img {
+      width: 100%;
+      height: auto;
+    }
+    .banner .content-overlay {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+    }
+    .banner .content-overlay .black-text {
+      color: #000000;
+    }
+    .banner .content-overlay .white-text {
+      color: #ffffff;
+    }
+
+    .banner h2 {
+      font-size: 2.5rem;
+      margin: 20px 0;
+    }
+
+    .banner .product-btn {
+      padding: 12px 24px;
+      font-size: 1.2rem;
+      color: #ffffff;
+      background-color: #06c;
+      border: none;
+      cursor: pointer;
+      border-radius: 30px;
+      transition: background-color 0.3s ease;
+      margin-top: 20px; /* Ensure buttons are below the text */
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <div class="navbar">
+      <div class="navbar-item" id="store">Store</div>
+      <div class="navbar-item" id="ai">AI</div>
+      <div class="navbar-item" id="workspace">Workspace</div>
+      <div class="navbar-item" id="support">Support</div>
+    </div>
+  </header>
+
+  <!-- Dropdown Menus -->
+  <div class="dropdown" id="store-dropdown">
+    <p>Explore The Latest</p>
+    <a href="echo_ai_page.html">AI</a>
+    <a href="echo_workspace_page.html">Workspace</a>
+    <a href="index.html">Home</a>
+  </div>
+  <div class="dropdown" id="ai-dropdown">
+    <p>Explore The Latest In AI Technology</p>
+    <a href="echo_ai_page.html">Echo</a>
+    <a href="echo_ai_page.html">Echo Education</a>
+  </div>
+  <div class="dropdown" id="workspace-dropdown">
+    <p>Explore The Latest Workspace Software</p>
+    <a href="echo_workspace_page.html">Workspace</a>
+  </div>
+  <div class="dropdown" id="support-dropdown">
+    <p>Contact Support</p>
+    <a href="mailto:foxcatok@gmail.com">Email</a>
+    <a href="exxtal_tos.html">ToS</a>
+    <a href="exxtal_faq.html">FaQ</a>
+    <a href="exxtal_blog.html">Blog</a>
+  </div>
+
+  <h1 class="dear_echo_header">Dear Echo...</h1>
+
+  <!-- Content Section with Cards -->
+  <div class="content-container">
+    <!-- Card 1 -->
+    <div class="card">
+      <img src="dear_echo_1.png" alt="dear_echo_1" class="card_img">
+      <p class="small-text">Feb 19 | Echo Team</p>
+      <a href="dear_echo_blog_1.html" class="main-text">Dear Echo, how do I bring Echo to its fullest?</a>
+    </div>
+  </div>
+
+  <script>
+    // Function to trigger the download based on the product clicked
+    function downloadFile(product) {
+      let fileName = '';
+      if (product === 'Ghost_With_Visuals') {
+        fileName = 'Ghost_With_Visuals.html'; // Normal Echo file
+      } else if (product === 'Echo_work') {
+        fileName = 'Echo_work.html'; // Echo Workspace file
+      }
+      
+      const link = document.createElement('a');
+      link.href = `${fileName}`; // Replace with the correct path
+      link.download = fileName; // File name for download
+      link.click();
+    }
+
+    // Handle dropdown visibility for AI, Store, and Support
+const storeItem = document.getElementById('store');
+const supportItem = document.getElementById('support');
+const aiItem = document.getElementById('ai');
+const workspaceItem = document.getElementById('workspace');
+const storeDropdown = document.getElementById('store-dropdown');
+const supportDropdown = document.getElementById('support-dropdown');
+const aiDropdown = document.getElementById('ai-dropdown');
+const workspaceDropdown = document.getElementById('workspace-dropdown');
+
+// Function to show the dropdown
+function showDropdown(dropdown) {
+  dropdown.style.display = 'block';
+  document.querySelector('header').classList.add('active'); // Apply blur effect to header
+}
+
+// Function to hide the dropdown
+function hideDropdown(dropdown) {
+  dropdown.style.display = 'none';
+  document.querySelector('header').classList.remove('active'); // Remove blur effect from header
+}
+
+// Event listener for hovering over AI
+aiItem.addEventListener('mouseenter', () => {
+  showDropdown(aiDropdown);
+});
+
+// Event listener for leaving the AI section
+aiItem.addEventListener('mouseleave', () => {
+  if (!aiDropdown.matches(':hover')) { // If the mouse is not hovering over the dropdown, hide it
+    setTimeout(() => {
+      hideDropdown(aiDropdown);
+    }, 100);
+  }
+});
+
+// Event listener for hovering over store
+storeItem.addEventListener('mouseenter', () => {
+  showDropdown(storeDropdown);
+});
+storeItem.addEventListener('mouseleave', () => {
+  setTimeout(() => {
+    if (!storeDropdown.matches(':hover')) {
+      hideDropdown(storeDropdown);
+    }
+  }, 100);
+});
+
+// Event listener for hovering over support
+supportItem.addEventListener('mouseenter', () => {
+  showDropdown(supportDropdown);
+});
+supportItem.addEventListener('mouseleave', () => {
+  setTimeout(() => {
+    if (!supportDropdown.matches(':hover')) {
+      hideDropdown(supportDropdown);
+    }
+  }, 100);
+});
+
+// Event listener for hovering over Workspace
+workspaceItem.addEventListener('mouseenter', () => {
+  showDropdown(workspaceDropdown);
+});
+workspaceItem.addEventListener('mouseleave', () => {
+  setTimeout(() => {
+    if (!workspaceDropdown.matches(':hover')) {
+      hideDropdown(workspaceDropdown);
+    }
+  }, 100);
+});
+
+// Ensure dropdowns stay open when mouse is inside
+aiDropdown.addEventListener('mouseenter', () => {
+  aiDropdown.style.display = 'block';
+});
+aiDropdown.addEventListener('mouseleave', () => {
+  hideDropdown(aiDropdown);
+});
+
+storeDropdown.addEventListener('mouseenter', () => {
+  storeDropdown.style.display = 'block';
+});
+storeDropdown.addEventListener('mouseleave', () => {
+  hideDropdown(storeDropdown);
+});
+
+supportDropdown.addEventListener('mouseenter', () => {
+  supportDropdown.style.display = 'block';
+});
+supportDropdown.addEventListener('mouseleave', () => {
+  hideDropdown(supportDropdown);
+});
+
+workspaceDropdown.addEventListener('mouseenter', () => {
+  workspaceDropdown.style.display = 'block';
+});
+workspaceDropdown.addEventListener('mouseleave', () => {
+  hideDropdown(workspaceDropdown);
+});
+
+  </script>
+
+</body>
+</html>

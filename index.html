@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #login-form, #account-actions, #add-account-form {
+            display: none;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        input {
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Bank System</h1>
+
+    <!-- Login Form -->
+    <div id="login-form">
+        <h2>Login</h2>
+        <input type="text" id="name" placeholder="Name" /><br>
+        <input type="text" id="id" placeholder="ID" /><br>
+        <input type="password" id="password" placeholder="Password" /><br>
+        <button onclick="login()">Login</button><br>
+        <button onclick="showAddAccountForm()">Add Account</button> <!-- Add Account Button -->
+    </div>
+
+    <!-- Account Actions -->
+    <div id="account-actions">
+        <h2>Account Actions</h2>
+        <p id="balance-display">Balance: 0</p>
+        <button onclick="addTickets()">Add Tommy Tickets</button>
+        <button onclick="removeTickets()">Remove Tommy Tickets</button>
+        <button onclick="deleteAccount()">Delete Account</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Add Account Form -->
+    <div id="add-account-form">
+        <h2>Add Account</h2>
+        <input type="text" id="new-name" placeholder="Name" /><br>
+        <input type="text" id="new-id" placeholder="ID" /><br>
+        <input type="password" id="new-password" placeholder="Password" /><br>
+        <button onclick="addAccount()">Add Account</button>
+        <button onclick="cancelAddAccount()">Cancel</button>
+    </div>
+
+    <script>
+        // Load users from localStorage
+        function loadUsers() {
+            const users = localStorage.getItem('users');
+            return users ? JSON.parse(users) : [];
+        }
+
+        // Save users to localStorage
+        function saveUsers(users) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        // User login
+        function login() {
+            const name = document.getElementById('name').value;
+            const id = document.getElementById('id').value;
+            const password = document.getElementById('password').value;
+
+            const users = loadUsers();
+            const user = users.find(u => u.name === name && u.id === id && u.password === password);
+
+            if (user) {
+                alert('Login successful!');
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('account-actions').style.display = 'block';
+                displayBalance(user);
+                window.currentUser = user; // Store the logged-in user for later use
+            } else {
+                alert('Invalid credentials');
+            }
+        }
+
+        // Display user balance
+        function displayBalance(user) {
+            const balanceDisplay = document.getElementById('balance-display');
+            balanceDisplay.innerHTML = `Balance: ${user.balance} Tommy Tickets`;
+        }
+
+        // Show Add Account Form
+        function showAddAccountForm() {
+            document.getElementById('add-account-form').style.display = 'block';
+        }
+
+        // Add Account to localStorage
+        function addAccount() {
+            const newName = document.getElementById('new-name').value;
+            const newId = document.getElementById('new-id').value;
+            const newPassword = document.getElementById('new-password').value;
+
+            if (newName && newId && newPassword) {
+                const users = loadUsers();
+                const newUser = { name: newName, id: newId, password: newPassword, balance: 0 };
+                users.push(newUser);
+                saveUsers(users);
+                alert('Account added successfully!');
+                document.getElementById('add-account-form').style.display = 'none';
+            } else {
+                alert('Please fill out all fields!');
+            }
+        }
+
+        // Cancel Add Account
+        function cancelAddAccount() {
+            document.getElementById('add-account-form').style.display = 'none';
+        }
+
+        // Add Tommy Tickets
+        function addTickets() {
+            const ticketsToAdd = prompt("How many Tommy Tickets would you like to add?");
+            if (ticketsToAdd && !isNaN(ticketsToAdd)) {
+                ticketsToAdd = parseInt(ticketsToAdd);
+                if (ticketsToAdd > 0) {
+                    window.currentUser.balance += ticketsToAdd;
+                    saveUpdatedUser();
+                    displayBalance(window.currentUser);
+                } else {
+                    alert("Please enter a positive number.");
+                }
+            } else {
+                alert("Invalid input.");
+            }
+        }
+
+        // Remove Tommy Tickets
+        function removeTickets() {
+            const ticketsToRemove = prompt("How many Tommy Tickets would you like to remove?");
+            if (ticketsToRemove && !isNaN(ticketsToRemove)) {
+                ticketsToRemove = parseInt(ticketsToRemove);
+                if (ticketsToRemove > 0 && window.currentUser.balance >= ticketsToRemove) {
+                    window.currentUser.balance -= ticketsToRemove;
+                    saveUpdatedUser();
+                    displayBalance(window.currentUser);
+                } else if (window.currentUser.balance < ticketsToRemove) {
+                    alert("You don't have enough Tommy Tickets.");
+                } else {
+                    alert("Please enter a positive number.");
+                }
+            } else {
+                alert("Invalid input.");
+            }
+        }
+
+        // Save updated user data
+        function saveUpdatedUser() {
+            const users = loadUsers();
+            const userIndex = users.findIndex(u => u.id === window.currentUser.id);
+            if (userIndex !== -1) {
+                users[userIndex] = window.currentUser;
+                saveUsers(users);
+            }
+        }
+
+        // Delete Account
+        function deleteAccount() {
+            const confirmDelete = confirm("Are you sure you want to delete your account?");
+            if (confirmDelete) {
+                const users = loadUsers();
+                const userIndex = users.findIndex(u => u.id === window.currentUser.id);
+                if (userIndex !== -1) {
+                    users.splice(userIndex, 1);
+                    saveUsers(users);
+                    alert('Account deleted successfully!');
+                    logout();
+                }
+            }
+        }
+
+        // Logout
+        function logout() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('account-actions').style.display = 'none';
+        }
+
+        // Initial setup: show login form
+        window.onload = function() {
+            document.getElementById('login-form').style.display = 'block';
+        };
+    </script>
+</body>
+</html>

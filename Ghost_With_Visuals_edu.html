@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Echo - Your AI Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #FFFFFF;
+    }
+
+    #response {
+      margin-top: 20px;
+      font-size: 10px;
+      color: #000000;
+      text-align: center;
+    }
+    #head {
+      margin-top: 20px;
+      font-size: 50px;
+      color: #000000;
+      text-align: top;
+      font-weight: 500;
+    }
+    title {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #6200ea;
+      text-align: center;
+    }
+
+    #shoppingList {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #FFFFFF;
+      text-align: center;
+      white-space: pre-wrap;
+    }
+
+    #timerDisplay {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #FFFFFF;
+      font-weight: normal;
+      display: none;
+    }
+
+    /* Visualizer Canvas Styling */
+    #canvas {
+      margin-top: 40px;
+      background: transparent;
+      border-radius: 50%;
+      border: 0px solid #0000; /* Add border to ensure it's visible */
+    }
+
+  </style>
+</head>
+<body>
+  <div id="head" style="font-weight: bold;">Ghost</div>
+  <div id="response">Welcome to EchoAI, Education Edition 2025. Say "Start" for a list of inscrucions.</div>
+  <div id="shoppingList"></div>
+  <div id="timerDisplay">Timer: Not active</div>
+  
+  <!-- Canvas for the visualizer -->
+  <canvas id="canvas" width="500" height="500"></canvas>
+
+<script>
+
+
+  //Foxcat Studios - 2024, 2025: Ghost AI
+
+
+  // Declare the responses object here, before the code that handles speech recognition
+  //Saved Nerouns From Back End
+  const responses = {
+    "test": "Echo AI 2025, Use only for school work.",
+    "reboot": "Echo AI 2025, Use only for school work.",
+    "start": "Thank you for using EchoA I, To start say hey Echo to start asking questions. If I don't know the answer to something, not to fear! Every question you ask helps me learn. Together, we can have a brighter tomorow!",
+
+    // Casual Educational Questions
+    "what's the weather like today": "I can't check the weather, but it's always a good idea to look outside and see how the day feels!",
+    "what's the biggest planet in our solar system": "The biggest planet is Jupiter! It's so large that you could fit all of the other planets inside it!",
+    "how many continents are there": "There are seven continents: Africa, Antarctica, Asia, Europe, North America, Australia, and South America.",
+    "who invented the light bulb": "Thomas Edison is credited with inventing the practical lightbulb, though others like Nikola Tesla contributed to its development!",
+    "what's the fastest animal in the world": "The fastest animal is the peregrine falcon, which can dive at speeds of over 240 miles per hour!",
+    "how old is the earth": "The Earth is about 4.5 billion years old. That's a really long time!",
+    "what is photosynthesis": "Photosynthesis is the process by which plants turn sunlight into food, using water and carbon dioxide!",
+    "how does a rainbow form": "A rainbow forms when light is bent (or refracted) through water droplets in the air, creating a spectrum of colors!",
+    "who was the first president of the united states": "George Washington was the first president of the United States, serving from 1789 to 1797.",
+    "what is the moon made of": "The moon is made of rock and dust, and it has mountains, valleys, and large craters formed by impacts from space!",
+
+    // Teacher-related questions
+    "what is the name of miss rosniak's dog": "Julie Roczniak's dog is named Pikildili, and it's a Newfoundland breed!",
+    "what is miss rosniak's dog's breed": "Pikildili is a Newfoundland dog.",
+    "what is miss rosniak's son's name": "Julie Roczniak's son's name is Sebastian.",
+    "what does miss rosniak teach": "Julie Roczniak teaches Math and Science.",
+    "what is the name of miss rosnyak's dog": "Julie Roczniak's dog is named Pikildili, and it's a Newfoundland breed!",
+    "what is miss rosnyak's dog's breed": "Pikildili is a Newfoundland dog.",
+    "what is miss rosnyak's son's name": "Julie Roczniak's son's name is Sebastian.",
+    "what does miss rosnyak teach": "Julie Roczniak teaches Math and Science.",
+    
+    "what is the name of miss mcclure's child": "Briana McClure's child's name is McKinly.",
+    "what does miss mcclure teach": "Briana McClure teaches E L A and World Geography slash Ancient Civilizations.",
+    "does miss mcclure have any pets": "No, Briana McClure doesn't have any pets.",
+    "what is the name of ms mcclure's child": "Briana McClure's child's name is McKinly.",
+    "what does ms mcclure teach": "Briana McClure teaches E L A and World Geography slash Ancient Civilizations.",
+    "does ms mcclure have any pets": "No, Briana McClure doesn't have any pets.",
+
+    "what is your name": "My name is Echo, a Virtual Assistant. You are using the education edition of GhostAI 2025, designed to help with schoolwork and learning!",
+    "how are you": "I'm a virtual assistant, always here to help you with your studies!",
+    "goodbye": "Goodbye! Keep up the great work!",
+    "what time is it": () => new Date().toLocaleTimeString(),
+    "what is today's date": () => new Date().toLocaleDateString(),
+    "good morning": "Good morning! Ready to learn something new today?",
+    "good night": "Good night! Rest well and be ready for another day of learning!",
+    "what is your favorite movie": "I love learning about educational topics. What's your favorite subject?",
+    "can you play music": "I can't play music, but I can help you with your school questions!",
+    "hey Echo": "Yes, how can I assist with your studies?",
+    "Echo": "Yes, what would you like to learn today?",
+    "i'm sorry please only ask questions about your classes": "Let's focus on your schoolwork. What subject can I help you with?",
+    "who is your creator": "I was created by Roberto Estrada to help students like you!",
+    "laugh": "Hehe, let's keep learning fun!",
+    
+    "can you help me": "Of course! Ask me anything about your subjects or homework!",
+    "help": "If you need assistance with a school topic, just ask! For emergencies, call 911.",
+
+    // Essay Writing
+    "how do i write an essay": "To write an essay, start with an introduction that includes your thesis statement, followed by body paragraphs that support your thesis with evidence and examples, and conclude with a strong conclusion that summarizes your main points.",
+    "what is a thesis statement": "A thesis statement is a sentence that states the main idea or argument of your essay. It guides the direction of your writing.",
+    "how do i start an introduction": "Start your introduction with a hook to grab the reader's attention, provide some background information, and end with your thesis statement.",
+
+    // Unit Rate
+    "what is a unit rate": "A unit rate is a rate in which the second quantity in the comparison is one unit. For example, if you drive 60 miles in 2 hours, the unit rate is 30 miles per hour.",
+    "how do i find the unit rate": "To find the unit rate, divide the first quantity by the second quantity. For example, if you have 120 miles in 4 hours, divide 120 by 4 to get 30 miles per hour.",
+
+    // Fraction -> Decimal -> Percent
+    "how do i convert a fraction to a decimal": "To convert a fraction to a decimal, divide the numerator (top number) by the denominator (bottom number).",
+    "how do i convert a decimal to a percent": "To convert a decimal to a percent, multiply the decimal by 100 and add a percent sign. For example, 0.75 becomes 75%.",
+    "how do i convert a fraction to a percent": "To convert a fraction to a percent, first convert it to a decimal by dividing the numerator by the denominator, then multiply by 100 and add a percent sign.",
+
+    // Ancient Sumer
+    "what was ancient sumer": "Ancient Sumer was a civilization in southern Mesopotamia, known for its advances in writing, architecture, and governance.",
+    "what is the significance of the sumerians": "The Sumerians are significant for creating the first known writing system, cuneiform, and for their contributions to early urban development and government structures.",
+    "what did the sumerians invent": "The Sumerians invented cuneiform writing, the wheel, and made significant advances in agriculture, mathematics, and astronomy."
+};
+
+
+  // Microphone Visualizer Code
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const bufferLength = 256;
+  const dataArray = new Uint8Array(bufferLength);
+  let audioContext, analyser, microphoneSource;
+
+  async function startMicrophone() {
+    try {
+      // Create AudioContext
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      await audioContext.resume();  // Ensure AudioContext is resumed
+
+      // Create an analyser
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 512; // Analyser's FFT size
+
+      // Get the microphone stream
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      microphoneSource = audioContext.createMediaStreamSource(stream);
+      microphoneSource.connect(analyser);  // Connect to the analyser
+
+      animate();  // Start visualizer animation
+    } catch (err) {
+      console.error("Error accessing microphone: ", err);
+    }
+  }
+
+  // Visualizer Animation
+  function animate() {
+    requestAnimationFrame(animate); // Request next frame
+
+    analyser.getByteFrequencyData(dataArray); // Get frequency data
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas for next frame
+    const radius = Math.min(canvas.width, canvas.height) / 4;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    let sum = 0;
+    for (let i = 0; i < bufferLength; i++) {
+      sum += dataArray[i];
+    }
+    const average = sum / bufferLength;
+    const pulseRadius = radius + average / 3; // Pulse based on volume level
+    const opacity = average / 255;  // Opacity based on sound intensity
+
+    // Draw the pulsing circle with a more visible color
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, pulseRadius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0, 255, 0, ${opacity})`;  // Changed color to black                                                    :)))))))
+    ctx.fill();
+  }
+
+  // Button to start the audio context
+  document.addEventListener('click', () => {
+    if (!audioContext) {
+      startMicrophone();  // Start microphone visualizer when clicked
+    }
+  });
+
+  // Speech Recognition for Assistant
+  if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.continuous = true;
+
+    let isActive = false;
+    let commandTimeout;
+
+    let reminders = [];
+
+    let classes = [];
+
+    let timerId = null;
+    let timerDuration = 0;
+    let timerRemaining = 0;
+
+    const triggerWords = ["hey echo", "echo"];
+
+    let voices = [];
+    function loadVoices() {
+      voices = speechSynthesis.getVoices();
+    }
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = loadVoices;
+    } else {
+      loadVoices();
+    }
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      utterance.pitch = 1;
+      utterance.rate = 1;
+      const maleVoice = voices.find(voice => voice.name.includes("Male") || voice.name.includes("Google US English Male"));
+      utterance.voice = maleVoice || voices[0];
+      speechSynthesis.speak(utterance);
+    }
+
+    function handleCommand(spokenText) {
+      const responseDiv = document.getElementById("response");
+      let responseText = "I'm sorry, Please only ask questions about your classes.";
+
+      // Timer Handling
+      if (spokenText.includes("set a timer")) {
+        const timeMatch = spokenText.match(/(\d+)\s*(hour|minute|second)s?/);
+        if (timeMatch) {
+          const value = parseInt(timeMatch[1], 10);
+          const unit = timeMatch[2];
+          if (unit === "hour") {
+            timerDuration = value * 60 * 60;
+          } else if (unit === "minute") {
+            timerDuration = value * 60;
+          } else if (unit === "second") {
+            timerDuration = value;
+          }
+          timerRemaining = timerDuration;
+          startTimer();
+          responseText = `Timer set for ${value} ${unit}${value > 1 ? 's' : ''}.`;
+        } else {
+          responseText = "Sorry, I didn't catch that. Please specify hours, minutes, or seconds.";
+        }
+      } else if (spokenText === "how much time is left on my timer") {
+        responseText = timerRemaining > 0 ? `Time left: ${Math.floor(timerRemaining / 60)} minutes and ${timerRemaining % 60} seconds.` : "The timer has expired!";
+      } else if (spokenText === "cancel the timer" || spokenText === "stop the timer") {
+        clearInterval(timerId);
+        timerId = null;
+        timerRemaining = 0;
+        responseText = "Timer stopped.";
+      }
+      // Reminders handling
+      else if (spokenText === "what are my reminders") {
+        responseText = reminders.length > 0 ? "Here are your reminders: " + reminders.join(", ") : "You have no reminders.";
+      } else if (spokenText.startsWith("add ") && spokenText.includes(" to my reminders")) {
+        const item = spokenText.replace("add ", "").replace(" to my reminders", "").trim();
+        reminders.push(item);
+        responseText = `You added "${item}" to your reminders.`;
+      } else if (spokenText.startsWith("remove ") && spokenText.includes(" from my reminders")) {
+        const item = spokenText.replace("remove ", "").replace(" from my reminders", "").trim();
+        const index = reminders.indexOf(item);
+        if (index !== -1) {
+          reminders.splice(index, 1);
+          responseText = `You removed "${item}" from your reminders.`;
+        } else {
+          responseText = `"${item}" is not on your reminders.`;
+        }
+      }
+
+      // Classes
+      else if (spokenText === "what are my classes") {
+        responseText = reminders.length > 0 ? "Here are your Classes: " + reminders.join(", ") : "You have no Classes.";
+      } else if (spokenText.startsWith("add ") && spokenText.includes(" to my classes")) {
+        const item = spokenText.replace("add ", "").replace(" to my classes", "").trim();
+        reminders.push(item);
+        responseText = `You added "${item}" to your classes.`;
+      } else if (spokenText.startsWith("remove ") && spokenText.includes(" from my classes")) {
+        const item = spokenText.replace("remove ", "").replace(" from my classes", "").trim();
+        const index = reminders.indexOf(item);
+        if (index !== -1) {
+          reminders.splice(index, 1);
+          responseText = `You removed "${item}" from your classes.`;
+        } else {
+          responseText = `"${item}" is not on your classes.`;
+        }
+      }
+
+      // Image
+      else if (spokenText.startsWith("generate an image of a ")) {
+        const image = spokenText.replace("generate an image of a ", "").trim();
+        responseText = `I cannot generate an image of a ${image} at the moment.`;
+      }
+      else if (spokenText.startsWith("generate an image of an ")) {
+        const image = spokenText.replace("generate an image of an ", "").trim();
+        responseText = `I cannot generate an image of an ${image} at the moment.`;
+      }
+
+        // Music
+        else if (spokenText.startsWith("play ")) {
+          const music = spokenText.replace("play ", "").trim();
+          responseText = `I cannot play ${music} at the moment.`;
+        }
+        else if (spokenText.startsWith("play the song ")) {
+          const music = spokenText.replace("play the song ", "").trim();
+          responseText = `I cannot play the song ${music} at the moment.`;
+       }
+
+      // Answer pre-defined responses
+      else if (responses[spokenText]) {
+        responseText = typeof responses[spokenText] === "function" ? responses[spokenText]() : responses[spokenText];
+      }
+
+      responseDiv.textContent = responseText;
+      speak(responseText);
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(() => {
+        recognition.onresult = (event) => {
+          const spokenText = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+          console.log("Recognized: ", spokenText);
+
+          if (!isActive) {
+            if (triggerWords.includes(spokenText)) {
+              isActive = true;
+              document.getElementById("response").textContent = "Ask a question or command";
+              speak("I'm listening.");
+              clearTimeout(commandTimeout);
+              commandTimeout = setTimeout(() => {
+                isActive = false;
+                document.getElementById("response").textContent = "Listening for 'Hey Echo'...";
+              }, 10000);
+            }
+          } else {
+            handleCommand(spokenText);
+            clearTimeout(commandTimeout);
+            commandTimeout = setTimeout(() => {
+              isActive = false;
+              document.getElementById("response").textContent = "Listening for 'Hey Echo'...";
+            }, 10000);
+          }
+        };
+
+        recognition.start();
+      })
+      .catch((error) => {
+        console.error("Microphone access denied:", error);
+        alert("Please allow microphone access to use the assistant.");
+      });
+
+    function startTimer() {
+      if (timerId) clearInterval(timerId);
+      timerId = setInterval(() => {
+        if (timerRemaining > 0) {
+          timerRemaining--;
+          document.getElementById("timerDisplay").textContent = `Timer: ${Math.floor(timerRemaining / 60)} minutes and ${timerRemaining % 60} seconds remaining`;
+        } else {
+          clearInterval(timerId);
+          timerId = null;
+          document.getElementById("timerDisplay").textContent = "Timer finished!";
+          speak("Time's up!");
+        }
+      }, 1000);
+    }
+  } else {
+    alert("Your browser does not support speech recognition. Please use a compatible browser.");
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost - Your AI Assistant </title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #FFFFFF;
+      }
+
+      #response {
+        margin-top: 20px;
+        font-size: 10px;
+        color: #000000;
+        text-align: center;
+      }
+      #head {
+        margin-top: 20px;
+        font-size: 50px;
+        color: #000000;
+        text-align: top;
+        font-weight: 500;
+      }
+      title {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #6200ea;
+        text-align: center;
+      }
+
+      #shoppingList {
+        margin-top: 20px;
+        font-size: 16px;
+        color: #FFFFFF;
+        text-align: center;
+        white-space: pre-wrap;
+      }
+
+      #timerDisplay {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #FFFFFF;
+        font-weight: normal;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="head" style="font-weight: bold; ">Ghost</div>
+    <div id="response">Listening for "Hey Ghost"</div>
+    <div id="shoppingList"></div>
+    <div id="timerDisplay">Timer: Not active</div>
+<script>
+if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.continuous = true;
+
+    let isActive = false;
+    let commandTimeout;
+    let shoppingList = [];
+    let timerId = null;
+    let timerDuration = 0; // Timer duration in seconds
+    let timerRemaining = 0; // Remaining time for the timer
+
+    const triggerWords = ["hey ghost", "ghost"];
+    const responses = {
+        "what is your name": "My name is Ghost, a Virtual assistant.",
+        "how are you": "I'm just a bunch of code, but I'm running smoothly!",
+        "tell me a joke": "Why did the computer go to the doctor? It had a virus!",
+        "goodbye": "Goodbye! Have a great day!",
+        "what is roblox": "Roblox is an online game platform that allows users to program and play games created by themselves or others.",
+        "what time is it": () => new Date().toLocaleTimeString(),
+        "what is today's date": () => new Date().toLocaleDateString(),
+        "good morning": "Good morning! Have a great start to your day!",
+        "good night": "Good night! Sleep tight!",
+        "tell me a random fact": "Did you know that honey never spoils? Archaeologists have found pots of honey in ancient tombs that are over 3,000 years old!",
+        "what is your favorite movie": "Terminator",
+        "i'm sorry i don't understand that": " ",
+        "i'm sorry i don't understand": " ",
+        "i don't understand that": " ",
+        "what is harper": "Pookie",
+        "you're an idiot": "Womp to the power of 2",
+        "how are baby robots made": "When a programer is bored, they decide to write 'code', that code are the baby steps to making an A I assistant!",
+        "who is donald trump": "A republican; kamala is better",
+        "can you play music": "I cannot play music, but I can do many other things!",
+        "hey ghost": "Yes?",
+        "ghost": "Yes?",
+
+        "tell me a random recipe": "Ok! Here is a recipe for Caprese Salad. Combine 2 large tomatoes, sliced, with 8 oz fresh mozzarella cheese, sliced, in a large bowl. Add a handful of fresh basil leaves, either whole or chopped, and drizzle with 2 tablespoons of extra virgin olive oil and 1 tablespoon of balsamic vinegar. Season with salt and pepper to taste and gently toss the ingredients together. For added flavor, you can sprinkle some balsamic glaze on top. Serve immediately as a refreshing side dish or light appetizer. Enjoy the fresh and vibrant flavors of this simple Italian classic!",
+
+        "can you help me": "Of course! I can help you with a variety of tasks. Just tell me what you'd like to do!"
+    };
+
+let voices = [];
+function loadVoices() {
+    voices = speechSynthesis.getVoices();
+}
+if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = loadVoices;
+} else {
+    loadVoices();
+}
+
+function speak(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.pitch = 1;
+    utterance.rate = 1;
+    const maleVoice = voices.find(voice => voice.name.includes("Male") || voice.name.includes("Google US English Male"));
+    utterance.voice = maleVoice || voices[0];
+    speechSynthesis.speak(utterance);
+}
+
+function updateTimerDisplay() {
+    const timerDisplay = document.getElementById("timerDisplay");
+    if (timerRemaining > 0) {
+        const hoursLeft = Math.floor(timerRemaining / 3600);
+        const minutesLeft = Math.floor((timerRemaining % 3600) / 60);
+        const secondsLeft = timerRemaining % 60;
+        timerDisplay.textContent = `Timer: ${hoursLeft}h ${minutesLeft}m ${secondsLeft}s remaining`;
+        timerDisplay.style.display = "block"; // Show timer
+    } else {
+        timerDisplay.style.display = "none"; // Hide timer when it's done
+    }
+}
+
+function handleCommand(spokenText) {
+    const responseDiv = document.getElementById("response");
+    const shoppingListDiv = document.getElementById("shoppingList");
+
+    let responseText = "I'm sorry, I don't understand that.";
+
+    if (spokenText.startsWith("add ") && spokenText.includes(" to my shopping list")) {
+        const item = spokenText.replace("add ", "").replace(" to my shopping list", "").trim();
+        shoppingList.push(item); 
+        responseText = `You added "${item}" to your shopping list.`; 
+    } else if (spokenText.startsWith("remove ")) {
+        const item = spokenText.replace("remove ", "").trim();
+        const index = shoppingList.indexOf(item);
+        if (index > -1) {
+            shoppingList.splice(index, 1);
+            responseText = `"${item}" has been removed from your shopping list.`;
+        } else {
+            responseText = `"${item}" is not on your shopping list.`;
+        }
+    } else if (spokenText === "what is on my shopping list" || spokenText === "read my shopping list") {
+        if (shoppingList.length > 0) {
+            responseText = "Here is your shopping list: " + shoppingList.join(", ");
+        } else {
+            responseText = "Your shopping list is empty.";
+            shoppingListDiv.textContent = "";
+        }
+    } else if (spokenText.startsWith("set a timer for")) {
+        const match = spokenText.match(/set a timer for (\d+) hours?/) || spokenText.match(/set a timer for (\d+) minutes?/) || spokenText.match(/set a timer for (\d+) seconds?/);
+        let hours = 0, minutes = 0, seconds = 0;
+        if (match) {
+            if (spokenText.includes("hour")) {
+                hours = parseInt(match[1]);
+            } else if (spokenText.includes("minute")) {
+                minutes = parseInt(match[1]);
+            } else if (spokenText.includes("second")) {
+                seconds = parseInt(match[1]);
+            }
+            timerDuration = (hours * 3600) + (minutes * 60) + seconds;
+            timerRemaining = timerDuration;
+            if (timerId) {
+                clearInterval(timerId);
+            }
+            timerId = setInterval(() => {
+                if (timerRemaining > 0) {
+                    timerRemaining--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerId);
+                    timerId = null;
+                    responseText = "Time's up!";
+                    speak(responseText);
+                    updateTimerDisplay();
+                }
+            }, 1000);
+            responseText = `Timer set for ${hours ? `${hours} hour(s) ` : ""}${minutes ? `${minutes} minute(s) ` : ""}${seconds ? `${seconds} second(s)` : ""}.`;
+            updateTimerDisplay();
+        }
+    } else if (spokenText === "how much time is left on the timer") {
+        if (timerId) {
+            const hoursLeft = Math.floor(timerRemaining / 3600);
+            const minutesLeft = Math.floor((timerRemaining % 3600) / 60);
+            const secondsLeft = timerRemaining % 60;
+            responseText = `There are ${hoursLeft} hours, ${minutesLeft} minutes, and ${secondsLeft} seconds left on the timer.`;
+        } else {
+            responseText = "There is no active timer.";
+        }
+    } else if (spokenText === "cancel the timer") {
+        if (timerId) {
+            clearInterval(timerId);
+            timerId = null;
+            timerRemaining = 0;
+            responseText = "The timer has been canceled.";
+            updateTimerDisplay();
+        } else {
+            responseText = "There is no active timer to cancel.";
+        }
+    } else if (responses[spokenText]) {
+        responseText = typeof responses[spokenText] === "function" ? responses[spokenText](spokenText) : responses[spokenText];
+    }
+
+    responseDiv.textContent = responseText;
+    speak(responseText);
+}
+
+navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(() => {
+        recognition.onresult = (event) => {
+            const responseDiv = document.getElementById("response");
+            const spokenText = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+            console.log("Recognized: ", spokenText);
+
+            if (!isActive) {
+                if (triggerWords.includes(spokenText)) {
+                    isActive = true;
+                    responseDiv.textContent = "I'm listening for your command!";
+                    speak("I'm listening.");
+                    clearTimeout(commandTimeout);
+                    commandTimeout = setTimeout(() => {
+                        isActive = false;
+                        responseDiv.textContent = "Listening for 'Hey Ghost'...";
+                    }, 10000);
+                }
+            } else {
+                handleCommand(spokenText);
+                clearTimeout(commandTimeout);
+                commandTimeout = setTimeout(() => {
+                    isActive = false;
+                    responseDiv.textContent = "Listening for 'Hey Ghost'...";
+                }, 10000);
+            }
+        };
+
+        recognition.onerror = (event) => {
+            const responseDiv = document.getElementById("response");
+            console.error("Speech Recognition Error:", event.error);
+            responseDiv.textContent = "Error in recognition: " + event.error;
+            speak("Error in recognition.");
+        };
+
+        recognition.onend = () => {
+            console.log("Recognition ended, restarting...");
+            recognition.start(); // Restart recognition for continuous listening
+        };
+
+        recognition.start();
+    })
+    .catch((error) => {
+        console.error("Microphone access denied:", error);
+        alert("Please allow microphone access to use the assistant.");
+    });
+
+} else {
+    alert("Your browser does not support speech recognition. Please use a compatible browser.");
+}
+
+
+</script>
+
+</body>
+</html>

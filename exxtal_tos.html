@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exxtal Tech | Terms of Service</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+      overflow-x: hidden;
+    }
+
+    /* Header styles */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #333;
+      text-align: center;
+      padding: 5px 0;
+      font-size: 1rem;
+      z-index: 100;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    header .company-name {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    /* Navbar container */
+    .navbar {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .navbar-item {
+      position: relative;
+      cursor: pointer;
+      padding: 8px 20px;
+      transition: color 0.3s ease;
+    }
+
+    /* Dropdown Menu */
+    .dropdown {
+      position: fixed;
+      top: 50px;
+      left: 0;
+      display: none;
+      width: 100vw;
+      background-color: #fff;
+      color: #000000;
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 200;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: dropdown 0.4s ease forwards;
+    }
+
+    @keyframes dropdown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .dropdown a {
+      color: #000000;
+      text-decoration: none;
+      display: block;
+      padding: 10px 0;
+      font-size: 20px;
+      transition: background-color 0.2s ease;
+    }
+
+    .dropdown a:hover {
+      background-color: #ffffff;
+    }
+
+    /* Content container */
+    .content-container {
+      margin-top: 120px;
+      padding: 20px;
+    }
+
+    /* Banner Section */
+    .banner {
+      position: relative;
+      text-align: center;
+      background-color: transparent;
+      color: #fff;
+      padding: 100px 0;
+    }
+
+    .banner img {
+      width: 100%;
+      height: auto;
+    }
+
+    .banner .content-overlay {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+    }
+
+    .banner h2 {
+      font-size: 2.5rem;
+      margin: 20px 0;
+    }
+
+    /* Button Styling */
+    .product-btn {
+      padding: 12px 24px;
+      font-size: 1.2rem;
+      color: #ffffff;
+      background-color: #06c;
+      border: none;
+      cursor: pointer;
+      border-radius: 30px;
+      transition: background-color 0.3s ease;
+      margin-top: 20px;
+    }
+
+    .product-btn:hover {
+      background-color: #005bb5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <div class="navbar">
+      <div class="navbar-item" id="store">Store</div>
+      <div class="navbar-item" id="ai">AI</div>
+      <div class="navbar-item" id="workspace">Workspace</div>
+      <div class="navbar-item" id="support">Support</div>
+    </div>
+  </header>
+
+  <!-- Dropdown Menus -->
+  <div class="dropdown" id="store-dropdown">
+    <p>Explore The Latest</p>
+    <a href="echo_ai_page.html">AI</a>
+    <a href="echo_workspace_page.html">Workspace</a>
+    <a href="index.html">Home</a>
+  </div>
+  <div class="dropdown" id="ai-dropdown">
+    <p>Explore The Latest In AI Technology</p>
+    <a href="echo_ai_page.html">Echo</a>
+    <a href="echo_ai_page.html">Echo Education</a>
+  </div>
+  <div class="dropdown" id="workspace-dropdown">
+    <p>Explore The Latest Workspace Software</p>
+    <a href="echo_workspace_page.html">Workspace</a>
+  </div>
+  <div class="dropdown" id="support-dropdown">
+    <p>Contact Support</p>
+    <a href="mailto:foxcatok@gmail.com">Email</a>
+    <a href="exxtal_tos.html">ToS</a>
+    <a href="exxtal_faq.html">FaQ</a>
+  </div>
+
+  <!-- Terms of Service Content -->
+  <div class="content-container">
+    <h1>Terms of Service</h1>
+    <p>Welcome to Exxtal! These are the terms and conditions governing your use of our website and services. By accessing or using Exxtal, you agree to comply with these Terms of Service and all applicable laws and regulations.</p>
+
+    <h2>1. Acceptance of Terms</h2>
+    <p>By using our services, you agree to these terms, which may be updated from time to time. We will notify you of any changes by posting the updated terms on this page.</p>
+
+    <h2>2. User Responsibilities</h2>
+    <p>Users are responsible for their activities on Exxtal, and agree to not engage in any illegal or harmful activities while using the services provided.</p>
+
+    <h2>3. Privacy and Data Collection</h2>
+    <p>We value your privacy. Our collection and usage of your data is explained in these terms</p>
+
+    <h2>4. Intellectual Property</h2>
+    <p>All content, trademarks, and other intellectual property on Exxtal are owned by us or our licensors. You are granted a limited, non-transferable license to use our services for personal, non-commercial purposes.</p>
+
+    <h2>5. Limitation of Liability</h2>
+    <p>We are not liable for any damages that result from the use or inability to use our services. Your use of our site is at your own risk.</p>
+
+    <h2>6. Termination</h2>
+    <p>We reserve the right to terminate or suspend access to our services at any time, without notice, for conduct that violates these terms or is deemed harmful to the platform.</p>
+
+    <h2>7. Governing Law</h2>
+    <p>These terms are governed by the laws of the jurisdiction in which Exxtal operates.</p>
+
+    <h2>8. Contact Information</h2>
+    <p>If you have any questions about these Terms of Service, please contact us at <a href="mailto:foxcatok@gmail.com">foxcatok@gmail.com</a>.</p>
+  </div>
+
+  <script>
+    // Handle dropdown visibility for AI, Store, and Support
+    const storeItem = document.getElementById('store');
+    const supportItem = document.getElementById('support');
+    const aiItem = document.getElementById('ai');
+    const workspaceItem = document.getElementById('workspace');
+    const storeDropdown = document.getElementById('store-dropdown');
+    const supportDropdown = document.getElementById('support-dropdown');
+    const aiDropdown = document.getElementById('ai-dropdown');
+    const workspaceDropdown = document.getElementById('workspace-dropdown');
+
+    function showDropdown(dropdown) {
+      dropdown.style.display = 'block';
+      document.querySelector('header').classList.add('active');
+    }
+
+    function hideDropdown(dropdown) {
+      dropdown.style.display = 'none';
+      document.querySelector('header').classList.remove('active');
+    }
+
+    aiItem.addEventListener('mouseenter', () => {
+      showDropdown(aiDropdown);
+    });
+    aiItem.addEventListener('mouseleave', () => {
+      if (!aiDropdown.matches(':hover')) {
+        setTimeout(() => {
+          hideDropdown(aiDropdown);
+        }, 100);
+      }
+    });
+
+    storeItem.addEventListener('mouseenter', () => {
+      showDropdown(storeDropdown);
+    });
+    storeItem.addEventListener('mouseleave', () => {
+      setTimeout(() => {
+        if (!storeDropdown.matches(':hover')) {
+          hideDropdown(storeDropdown);
+        }
+      }, 100);
+    });
+
+    supportItem.addEventListener('mouseenter', () => {
+      showDropdown(supportDropdown);
+    });
+    supportItem.addEventListener('mouseleave', () => {
+      setTimeout(() => {
+        if (!supportDropdown.matches(':hover')) {
+          hideDropdown(supportDropdown);
+        }
+      }, 100);
+    });
+
+    workspaceItem.addEventListener('mouseenter', () => {
+      showDropdown(workspaceDropdown);
+    });
+    workspaceItem.addEventListener('mouseleave', () => {
+      setTimeout(() => {
+        if (!workspaceDropdown.matches(':hover')) {
+          hideDropdown(workspaceDropdown);
+        }
+      }, 100);
+    });
+
+    aiDropdown.addEventListener('mouseenter', () => {
+      aiDropdown.style.display = 'block';
+    });
+    aiDropdown.addEventListener('mouseleave', () => {
+      hideDropdown(aiDropdown);
+    });
+
+    storeDropdown.addEventListener('mouseenter', () => {
+      storeDropdown.style.display = 'block';
+    });
+    storeDropdown.addEventListener('mouseleave', () => {
+      hideDropdown(storeDropdown);
+    });
+
+    supportDropdown.addEventListener('mouseenter', () => {
+      supportDropdown.style.display = 'block';
+    });
+    supportDropdown.addEventListener('mouseleave', () => {
+      hideDropdown(supportDropdown);
+    });
+
+    workspaceDropdown.addEventListener('mouseenter', () => {
+      workspaceDropdown.style.display = 'block';
+    });
+    workspaceDropdown.addEventListener('mouseleave', () => {
+      hideDropdown(workspaceDropdown);
+    });
+  </script>
+
+</body>
+</html>

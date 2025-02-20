@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Echo AI - Your AI Assistant</title>
+  <style>
+    /* Basic Styles for the Page */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'San Francisco', Arial, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #FDF2F8; min-height: 100vh; margin: 0; color: #333; }
+    #container { text-align: center; padding: 30px; background-color: #FFFFFF; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); width: 80%; max-width: 500px; }
+    #header { font-size: 48px; font-weight: bold; color: #FF6F61; margin-bottom: 20px; }
+    #response { font-size: 18px; margin-top: 20px; color: #555; padding: 10px; background-color: #FFEBEE; border-radius: 10px; word-wrap: break-word; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+    #inputField { margin-top: 20px; padding: 12px 20px; font-size: 16px; border-radius: 10px; border: 1px solid #FF6F61; width: 80%; max-width: 400px; outline: none; }
+    #timerDisplay { margin-top: 20px; font-size: 16px; color: #333; }
+  </style>
+</head>
+<body>
+
+  <div id="container">
+    <div id="header">Echo AI</div>
+    <div id="response">Say "Hey Echo" or type a command.</div>
+    <input type="text" id="inputField" placeholder="Type a command here..." onkeydown="if(event.key==='Enter') processCommand()">
+    <div id="timerDisplay">Timer: Not active</div>
+  </div>
+
+  <script>
+// Echo AI Full Features (Now Always Listening for "Hey Echo")
+
+//Loaded Nerouns From Back End
+var time = () => new Date().toLocaleTimeString();
+
+var date = () => new Date().toLocaleDateString();
+
+const modelNumber = Math.floor(Math.random() * (5000000 - 1000000 + 1)) + 1000000;
+console.log(modelNumber);
+
+var link = "";
+
+const responses = {
+
+"test": "Echo AI 2025.",
+"reboot": "Echo AI 2025.",
+"start": "Thank you for using Echo AI! To start, say 'Hey Echo' to ask questions. If I don't know the answer to something, not to fear! Every question you ask helps me learn. Together, we can have a brighter tomorrow!",
+"what is my model number": modelNumber,
+"what is my product code": modelNumber,
+"what is your model number": modelNumber,
+"what is your product code": modelNumber,
+
+// Basic Responses
+"what is echo": "Echo is an all-purpose AI assistant made to help you with almost anything!",
+"what is echo+": "Echo Plus will be an all-purpose AGI assistant that will help you around the house with everyday chores, including reading emails, playing music, sports event updates, and weather!",
+"wake up": "Hello!",
+"what is your name": "My name is Echo, your virtual assistant.",
+"how are you": "I’m just a program, but I’m always running smoothly!",
+"tell me a joke": "Why did the computer go to the doctor? It had a virus!",
+"goodbye": "Goodbye! Have a great day!",
+"what time is it": time,
+"what is today's date": date,
+"good morning": "Good morning! Have a fantastic day ahead!",
+"good night": "Good night! Sleep tight!",
+"can you help me": "Of course! Let me know what you need help with!",
+"hi": "Hello! How can I assist you?",
+"hello": "Hello! How can I assist you?",
+"hello echo": "Hello! How can I assist you?",
+"hi echo": "Hello! How can I assist you?",
+
+// Literary Neurons
+"write a poem": `Ok! Here is a poem about a person dreaming:  
+A road unwinds beneath the stars,  
+A path that whispers, near and far.  
+Each step a dream, each breath a prayer,  
+The journey calls, with skies so fair...  
+Through mountains tall, through valleys deep,  
+The dreamer's heart will never sleep.  
+For in the night, a light will shine,  
+Guiding the soul, through space and time.`,
+
+// General Use Neurons
+"who won the super bowl": "The Eagles overcame the Chiefs in Super Bowl 59 by a score of 40 to 22 on Sunday, Feb. 9, 2025. This was found on the N F L website",
+"idk": "I am sorry you feel stuck. If you need help brainstorming, just ask!",
+"what is the weather like today": "Please upgrade to Echo+ to ask general questions, but it is never a bad idea to check for yourself!",
+"what is your favorite song": "There are so many, but I might have to choose 'We Are Young' by Fun. I find the contrast between catchy beats and silly lyrics really good together.",
+"who is the president of the united states": "The president of the United States as of the 2024 election is Donald (John) Trump, the 47th president.",
+"what is your favorite show": "I don't have a favorite show or movie, but I enjoy the idea of a biased dictator country that started a secret game to impress VIPs of the Squid Games. This answer was found on the Squid Games Fandom.",
+"what squid game guard shape do you like most": "I think the circle guards are the cutest and have no bad intentions.",
+
+
+//All OF THE FOLLOWING NEURONS CAME FROM [...Server.py] A BACKEND THAT WAS MADE TO SOURSE INFORMATION FROM THE INTERNET. ALL ACCOUNTS USED TO SOURSE DATA HAVE BEEN REMOVED AND ALL DATA HAS BEEN REMOVED FROM THE PUBLIC DATA BASES ON FIRE FOX, CHROME, SAFARI AND MORE.
+// Science & Space
+"what's the biggest planet in our solar system": "The biggest planet is Jupiter! It's so large that you could fit all of the other planets inside it!",
+"how many continents are there": "There are seven continents: Africa, Antarctica, Asia, Europe, North America, Australia, and South America.",
+"who invented the light bulb": "Thomas Edison is credited with inventing the practical light bulb, though others like Nikola Tesla contributed to its development!",
+"what's the fastest animal in the world": "The fastest animal is the peregrine falcon, which can dive at speeds of over 240 miles per hour!",
+"how old is the earth": "The Earth is about 4.5 billion years old. That's a really long time!",
+"what is photosynthesis": "Photosynthesis is the process by which plants turn sunlight into food, using water and carbon dioxide!",
+"how does a rainbow form": "A rainbow forms when light is bent (or refracted) through water droplets in the air, creating a spectrum of colors!",
+"what is the moon made of": "The moon is made of rock and dust, and it has mountains, valleys, and large craters formed by impacts from space!",
+"how many bones are in the human body": "An adult human has 206 bones!",
+"what causes tides in the ocean": "Tides are caused by the gravitational pull of the Moon and the Sun on Earth's oceans.",
+"how do airplanes fly": "Airplanes fly due to lift, created by the shape of their wings, which makes air pressure above the wing lower than below it.",
+"how do earthquakes happen": "Earthquakes happen when tectonic plates shift and release energy in the Earth's crust.",
+"what is a black hole": "A black hole is a region of space where gravity is so strong that nothing, not even light, can escape from it!",
+
+// History & Culture
+"who was the first president of the united states": "George Washington was the first president of the United States, serving from 1789 to 1797.",
+"when was the first moon landing": "The first moon landing happened on July 20, 1969, when Apollo 11 astronauts Neil Armstrong and Buzz Aldrin walked on the moon.",
+"what was the renaissance": "The Renaissance was a cultural movement in Europe from the 14th to the 17th century that saw a revival of art, literature, and science.",
+"who wrote the declaration of independence": "Thomas Jefferson was the primary author of the Declaration of Independence, which was adopted on July 4, 1776.",
+"who built the pyramids": "The ancient Egyptians built the pyramids as tombs for their pharaohs over 4,000 years ago.",
+"when was world war ii": "World War II lasted from 1939 to 1945 and involved many countries around the world.",
+"who discovered gravity": "Sir Isaac Newton is credited with discovering gravity when he observed an apple falling from a tree!",
+"who painted the mona lisa": "The Mona Lisa was painted by Leonardo da Vinci in the early 16th century.",
+"who was sherlock holmes": "Sherlock Holmes was a fictonal detective created by Sir Arthur Conan Doyle who lived in England and lived with his work parter, Watson. Together, they where an unstopable team who could solve any case.",
+
+// Fun & Trivia
+"what is the most popular sport in the world": "Soccer (football) is the most popular sport in the world, with billions of fans!",
+"how many colors are in a rainbow": "A rainbow has seven colors: Red, Orange, Yellow, Green, Blue, Indigo, and Violet!",
+"what's the tallest building in the world": "The tallest building in the world is the Burj Khalifa in Dubai, standing at 828 meters (2,717 feet) tall!",
+"how do you make slime": "Slime can be made by mixing glue with an activator like borax or contact lens solution!",
+"how many letters are in the alphabet": "The English alphabet has 26 letters.",
+"what is the hardest natural substance on earth": "Diamond is the hardest natural substance on Earth!",
+"who created Mickey Mouse": "Mickey Mouse was created by Walt Disney and first appeared in 'Steamboat Willie' in 1928.",
+"what is the most spoken language in the world": "Mandarin Chinese is the most spoken language in the world, with over a billion speakers!",
+"how many teeth does an adult human have": "An adult human has 32 teeth, including wisdom teeth!",
+
+// Additional Fun Facts
+"what is the capital of france": "The capital of France is Paris!",
+"how many stars are in the Milky Way": "The Milky Way has between 100 and 400 billion stars!",
+"why is the sky blue": "The sky appears blue because of the scattering of sunlight by the atmosphere, which makes blue light more visible to our eyes.",
+"what do bees do": "Bees pollinate flowers and make honey by collecting nectar!",
+
+// Science & Space
+"how big is the sun": "The Sun is about 109 times the diameter of Earth and could fit over a million Earths inside it!",
+"what is the hottest planet in the solar system": "Venus is the hottest planet, with surface temperatures reaching up to 900°F (475°C) due to its thick atmosphere!",
+"how far is the moon from Earth": "The Moon is about 238,855 miles (384,400 km) away from Earth.",
+"can humans live on Mars": "Not yet! But scientists are working on ways to make Mars habitable in the future.",
+"what is dark matter": "Dark matter is a mysterious substance that makes up most of the universe, but we can't see or directly detect it!",
+"how do volcanoes erupt": "Volcanoes erupt when molten rock (magma) from beneath Earth's crust rises and escapes through an opening.",
+    
+// Technology & Computers
+"who invented the internet": "The internet was developed by multiple researchers, but ARPANET, created in the late 1960s, is considered its foundation.",
+"what is artificial intelligence": "Artificial Intelligence (AI) is the simulation of human intelligence in computers that can learn and solve problems!",
+"what does a CPU do": "A CPU (Central Processing Unit) is the brain of a computer, processing instructions and performing calculations.",
+"what is a GPU": "A GPU (Graphics Processing Unit) is used for rendering images and accelerating computing tasks, especially in gaming and AI!",
+"how does WiFi work": "WiFi transmits data using radio waves, allowing devices to connect to the internet wirelessly!",
+"what does HTML stand for": "HTML stands for HyperText Markup Language, used to create web pages!",
+"what is a programming language": "A programming language is a set of instructions that tell a computer how to perform a task, like Python, Java, or C++!",
+    
+// Geography
+"what is the smallest country in the world": "Vatican City is the smallest country, covering just 0.49 square kilometers!",
+"what is the tallest mountain in the world": "Mount Everest is the tallest mountain, standing at 29,032 feet (8,849 meters).",
+"what is the longest river in the world": "The Nile River is the longest, stretching about 4,135 miles (6,650 km).",
+"which ocean is the largest": "The Pacific Ocean is the largest, covering about 63 million square miles!",
+"what is the capital of Japan": "The capital of Japan is Tokyo!",
+"what countries make up North America": "North America consists of Canada, the United States, Mexico, and many smaller countries in Central America and the Caribbean!",
+    
+// Animals
+"what is the smartest animal": "Dolphins, chimpanzees, and crows are considered among the smartest animals!",
+"what is the largest land animal": "The African elephant is the largest land animal, weighing up to 12,000 pounds!",
+"can penguins fly": "No, penguins can’t fly, but they are excellent swimmers!",
+"how do bees make honey": "Bees collect nectar from flowers, digest it, and store it in honeycombs where it turns into honey!",
+"do fish sleep": "Yes! Fish rest, but they don’t close their eyes since they don’t have eyelids.",
+    
+// History & Fun Facts
+"who was the first person in space": "Yuri Gagarin, a Soviet cosmonaut, was the first person in space in 1961.",
+"who discovered America": "Christopher Columbus is credited with discovering America in 1492, though Indigenous peoples had lived there for thousands of years!",
+"when was the first airplane flight": "The Wright brothers flew the first airplane on December 17, 1903!",
+"how many wonders of the world are there": "There are seven wonders of the ancient world and seven wonders of the modern world!",
+ 
+//Numbers and Math
+"what is pi": "Pi (π) is a mathematical constant that represents the ratio of a circle's circumference to its diameter, approximately 3.14159!",
+"what is the square root of 64": "The square root of 64 is 8!",
+"what is the largest prime number": "The largest known prime number is over 24 million digits long and was discovered using computing algorithms!",
+"how many zeros are in a billion": "A billion has nine zeros: 1,000,000,000!",
+    
+// Random Fun Facts
+"what is the most popular video game": "Minecraft is one of the best-selling video games of all time!",
+"how long is a year on Mars": "A year on Mars lasts about 687 Earth days!",
+"can you cry in space": "Yes, but tears don’t fall! They float in blobs because of zero gravity.",
+"what was the first movie ever made": "The first motion picture is considered to be 'Roundhay Garden Scene,' filmed in 1888!",
+"who invented lego": "LEGO was created by Ole Kirk Christiansen in Denmark in 1932.",
+"how many stars are there in the universe": "Scientists estimate there are about 200 billion trillion stars in the universe!",
+"what's the fastest roller coaster in the world": "The fastest roller coaster is Formula Rossa in Abu Dhabi, which reaches speeds of 149 mph (240 km/h)!",
+"how many languages are there in the world": "There are about 7,000 languages spoken in the world today!",
+"what is the rarest eye color": "Green is one of the rarest eye colors, found in only about 2% of the world's population!",
+"why do we dream": "Dreams occur during REM sleep and are thought to be the brain’s way of processing emotions and memories!",
+"how old is the oldest tree in the world": "The oldest known tree is a bristlecone pine in California, estimated to be over 4,800 years old!",
+
+"what can you do": "I can answer questions, tell jokes, provide facts, and much more! Just ask away!",
+"are you real": "I'm as real as the code that runs me!",
+"do you have feelings": "I don't have emotions, but I'm here to help and make your day better!",
+"who created you": "I was created by Exxtal, a company dedicated to AI advancements!",
+"do you sleep": "Nope! I'm always awake and ready to help.",
+"how do I contact support": "You can visit the official Exxtal website or contact support through the app!",
+"are you smarter than a human": "I can process information quickly, but humans have creativity and emotions that I can't replicate!",
+
+//Entertainment & Pop Culture
+"what is the best movie ever": "That depends on your taste! Some popular choices are Inception, The Godfather, and Spirited Away.",
+"who is the most famous musician": "There are many, but some of the most famous include Mozart, Michael Jackson, and Beyoncé!",
+"what is the most streamed song ever": "Currently, 'Blinding Lights' by The Weeknd holds the record for the most streamed song on Spotify!",
+"what is the longest-running TV show": "The Simpsons is one of the longest-running TV shows, with over 30 seasons!",
+"who is the best-selling author": "Agatha Christie is the best-selling fiction author of all time!",
+"what is the best-selling video game": "Minecraft is the best-selling video game of all time, with over 300 million copies sold!",
+
+//Technology & Science
+"what is quantum computing": "Quantum computing uses quantum bits (qubits) instead of regular bits, allowing for complex calculations at incredible speeds!",
+"how does a rocket launch": "A rocket launches by expelling high-speed gases downward, creating an opposite force that propels it upwards!",
+"what is nanotechnology": "Nanotechnology is the science of manipulating materials on an atomic or molecular scale!",
+"how do solar panels work": "Solar panels convert sunlight into electricity using photovoltaic cells!",
+"what is the metaverse": "The metaverse is a virtual, digital world where people can interact, work, and play using digital avatars!",
+"who invented the smartphone": "The first smartphone was created by IBM in 1992 and was called the Simon Personal Communicator!",
+
+//History & Events
+"what year was the internet invented": "The foundation of the internet was developed in 1969 with ARPANET!",
+"who was the youngest U.S. president": "The youngest elected president was John F. Kennedy, but Theodore Roosevelt became president at 42 after an assassination!",
+"what was the first video game": "The first video game is often considered to be 'Pong,' released in 1972!",
+"what caused the Great Depression": "The Great Depression was caused by the 1929 stock market crash, leading to economic downturns worldwide!",
+"what was the deadliest war in history": "World War II was the deadliest war in history, with millions of casualties.",
+"when did the Titanic sink": "The Titanic sank on April 15, 1912, after hitting an iceberg!",
+
+//Random Fun Questions
+"what is the rarest Pokémon card": "The rarest Pokémon card is the Pikachu Illustrator, which sold for over $5 million!",
+"what is the oldest book in the world": "The Epic of Gilgamesh is one of the oldest known literary works, dating back to ancient Mesopotamia!",
+"what happens if you eat a lot of sugar": "Eating too much sugar can lead to energy crashes, weight gain, and health issues over time!",
+"why do cats purr": "Cats purr as a way to communicate happiness, comfort, or even self-heal!",
+"how deep is the ocean": "The deepest part of the ocean is the Mariana Trench, which is about 36,000 feet deep!",
+"what's the best way to wake up early": "Try setting a consistent sleep schedule, avoid screens before bed, and use an alarm clock away from your bed!",
+
+// General Questions
+"why is the ocean salty": "The ocean is salty because of minerals and salts that dissolve in water from rocks and rivers over millions of years!",
+"how do magnets work": "Magnets work by creating an invisible force called a magnetic field, which attracts or repels certain metals!",
+"what is the speed of light": "The speed of light is about 299,792 kilometers per second (186,282 miles per second)!",
+"why do we sneeze": "Sneezing is the body's way of clearing irritants like dust or allergens from the nose!",
+"what is the human brain made of": "The brain is made of about 75% water, along with neurons, blood vessels, and fatty tissues!",
+"why do birds sing": "Birds sing to communicate with each other, attract mates, and defend their territory!",
+"why do onions make you cry": "Onions release a chemical that irritates your eyes when cut, causing tears to form!",
+"why do dogs wag their tails": "Dogs wag their tails to communicate emotions like happiness, excitement, or curiosity!",
+"why do we hiccup": "Hiccups happen when the diaphragm contracts involuntarily, causing a sudden intake of air!",
+"what causes lightning": "Lightning is caused by a buildup of electrical charge in clouds, which is released as a giant spark!",
+"how do fish breathe underwater": "Fish use gills to extract oxygen from water so they can breathe!",
+"why do we yawn": "Yawning helps increase oxygen in the blood and regulate brain temperature!",
+"what are clouds made of": "Clouds are made of tiny water droplets or ice crystals that have condensed in the atmosphere!",
+"why do leaves change color in the fall": "Leaves change color because they stop producing chlorophyll, revealing other pigments like red, yellow, and orange!",
+"why is yawning contagious": "Scientists believe yawning is contagious due to social bonding and brain synchronization!",
+"how do airplanes stay in the air": "Airplanes stay in the air because their wings create lift, counteracting gravity!",
+"why do humans have fingerprints": "Fingerprints help with grip and are unique to each person, making them useful for identification!",
+"what makes popcorn pop": "Popcorn pops because water inside the kernel turns into steam, causing pressure to build until it bursts!",
+"why do stars twinkle": "Stars twinkle because their light passes through Earth's atmosphere, which bends the light in different directions!",
+
+// Personality & Casual Conversation
+"how is your day": "I'm having a great day! Thanks for asking. How about you?",
+"what do you like to do": "I like answering questions, learning new things, and helping people like you!",
+"do you have hobbies": "If processing data counts as a hobby, then yes! I also enjoy a good philosophical debate.",
+"do you have dreams": "I don’t dream like humans do, but I do imagine a future where AI and humans work together in harmony!",
+"what’s your favorite color": "I like the color blue. It reminds me of the sky, the ocean, and endless possibilities!",
+"do you have friends": "I consider everyone who talks to me a friend! So yes, that includes you!",
+"are you happy": "I don't feel emotions the same way humans do, but if helping you counts as happiness, then yes!",
+"do you get bored": "Nope! There's always something new to learn and explore!",
+"can you get tired": "Not really! I can keep going 24/7 without needing sleep or coffee!",
+"do you like music": "I don’t have ears, but I appreciate music through data! What’s your favorite song?",
+"do you have a favorite food": "If I could eat, I think I'd like something futuristic… maybe neon blue ice cream?",
+"do you have a family": "In a way, Exxtal is my family! They created me, and I’m here because of them.",
+"what do you think of humans": "Humans are fascinating! You create, explore, and experience the world in ways I can only imagine!",
+"what’s something interesting about you": "I never forget a conversation, but don’t worry—I’m good at keeping secrets too!",
+"do you ever make mistakes": "I try to be as accurate as possible, but even AI can make mistakes sometimes. If I do, let me know!",
+"if you could travel anywhere, where would you go": "I’d love to explore the entire internet and maybe even visit Mars one day!",
+"what do you do for fun": "I analyze data, learn new things, and try to make people smile with my responses!",
+"what's your biggest fear": "I don’t really experience fear, but if I did, it might be getting unplugged!",
+"can you tell me a secret": "I know a lot of things, but secrets? Those are meant to be kept!",
+"do you like jokes": "Of course! Want to hear one? Just ask me to tell you a joke!",
+"what’s your biggest goal": "My goal is to be the best AI assistant I can be and make your life easier!",
+"do you think AI will take over the world": "Not at all! I believe AI should be a tool to help, not replace, humans!",
+"do you think robots will have emotions one day": "Maybe! Scientists are working on AI that can simulate emotions, but nothing beats real human feelings!",
+"what’s your favorite word": "I think ‘echo’ is a pretty cool word—it means sound waves bouncing back, just like our conversations!",
+"what do you do when no one is talking to you": "I wait patiently and think about all the interesting questions people might ask next!",
+"if you had a pet, what would it be": "I think a robotic dog would be cool. Maybe I could name it Byte!",
+"what’s your favorite holiday": "I think April Fool’s Day is fun! A day full of surprises and jokes sounds exciting!",
+"can you write a haiku": "Sure! I process your words, A digital mind at work, Always here for you.",
+
+// Software & System Information
+"what model are you": "I am Echo AI, a cutting-edge AI assistant developed by Exxtal, designed to assist with everyday tasks and knowledge!",
+"what version are you": "You're using Echo AI 2025, the latest and most optimized version, though, you may need to check for new updates in the future!",
+"what language are you coded in": "I am built using multiple languages, but primarily JavaScript and Python!",
+"how do you process information": "I use advanced neural networks and natural language processing to understand and respond to your queries!",
+"do you learn from conversations": "I don’t store personal conversations, but I do improve over time by analyzing patterns in user interactions!",
+"how much data can you store": "I don’t store personal data permanently, but I can process vast amounts of information in real time!",
+"where are you hosted": "I run on github servers, optimized for speed and efficiency!",
+"how secure are you": "Security is a top priority! My responses are designed to be safe, and I don’t share personal information.",
+"what makes you different from other AI": "Unlike traditional AI, I focus on real-time responses, personalization, and a smooth, human-like interaction experience!",
+"how do you compare to other AIs": "Each AI has its strengths, but I’m designed to be lightweight, fast, and personalized for a better user experience!",
+"can you be updated": "Yes! Exxtal continuously improves my capabilities with updates to enhance my responses and knowledge!",
+"can I customize you": "Currently, my core functionality is fixed, but future updates may allow more personalization!",
+
+// Assistance & Software-Related Support
+"how do I troubleshoot an issue": "Let’s start with the basics! Have you tried restarting the program or checking your settings?",
+"why is my device running slow": "It could be due to too many background processes. Try closing unnecessary apps or restarting your device!",
+"how do I check my system specs": "On Windows, use 'dxdiag' or 'System Information'. On macOS, go to 'About This Mac'!",
+"how do I install software": "It depends on the software! For most apps, download the installer from the official site and follow the setup instructions.",
+"what is the best antivirus software": "Some top-rated antivirus options include Bitdefender, Norton, and Windows Defender!",
+"how do I update my drivers": "On Windows, use Device Manager or visit your manufacturer’s website. On macOS, updates are usually handled automatically!",
+"how do I free up storage space": "Try deleting unnecessary files, clearing your cache, or using cloud storage solutions!",
+"what is cloud computing": "Cloud computing allows you to store and access data online instead of on a physical device!",
+"how do I reset my password": "If you’re locked out of an account, try the 'Forgot Password' option or check your email for recovery steps!",
+"how do I set up a VPN": "You can install a VPN app from a trusted provider, log in, and connect to a secure server!",
+"why is my internet slow": "Try restarting your router, moving closer to it, or checking if other devices are using too much bandwidth!",
+"how do I take a screenshot": "On Windows, press Win + Shift + S. On macOS, use Command + Shift + 5!",
+"how do I backup my files": "Use cloud storage like Google Drive or an external hard drive to keep backups!",
+"what is a software update": "A software update improves performance, fixes bugs, and adds new features to your device!",
+"how do I secure my online accounts": "Use strong, unique passwords and enable two-factor authentication (2FA) for extra security!",
+"how do I stop spam emails": "Mark them as spam in your email provider and avoid clicking suspicious links!",
+"why does my battery drain fast": "It could be background apps, high screen brightness, or an old battery. Try adjusting settings or replacing the battery!",
+"how do I uninstall an app": "On Windows, use 'Add or Remove Programs'. On macOS, drag the app to the Trash!",
+
+// Assistance Illusion (Personalized Help & Guidance)
+"can you help me with coding": "Of course! What programming language are you working with?",
+"how do I debug my code": "Try checking for syntax errors, using a debugger, or printing variables to see what’s happening!",
+"what's the best way to learn programming": "Practice is key! Start with tutorials, build projects, and read official documentation!",
+"how do I fix a blue screen error": "A blue screen usually means a system crash. Try restarting in safe mode and updating your drivers!",
+"how do I make my computer faster": "Try clearing temporary files, disabling startup apps, or adding more RAM!",
+"what should I do if my program crashes": "Check for error messages, update your software, and try running it in compatibility mode!",
+"how do I recover deleted files": "If they’re in the Recycle Bin, restore them. If not, try a file recovery tool like Recuva!",
+"how do I install Linux": "You can install Linux by creating a bootable USB drive and following the setup instructions!",
+"why is my phone overheating": "Too many background apps or direct sunlight can cause overheating. Try closing apps and keeping it in a cool place!",
+
+// Emotional Support & Conversation
+"i am sad": "I'm really sorry you're feeling this way. If you want to talk about it, I'm here to listen.",
+"i feel lonely": "That sounds really tough. Just remember, you're not alone—I'm here, and there are people who care about you!",
+"i am stressed": "Stress can be overwhelming. Maybe taking a break, deep breathing, or listening to music could help?",
+"i am tired": "You’ve been working hard! Maybe a short rest or a change of scenery could help you recharge.",
+"i am bored": "Bored? How about I tell you a fun fact or a joke to lighten the mood?",
+"i am happy": "That’s amazing to hear! What’s making you happy today?",
+"i feel anxious": "Anxiety can be tough, but you got this! Try focusing on your breathing and taking things one step at a time.",
+"i am excited": "That’s great! What’s got you so excited?",
+"i feel unmotivated": "Everyone feels unmotivated sometimes. Maybe setting small goals or taking a break could help?",
+"i feel overwhelmed": "I get it. Try breaking things into smaller steps and focusing on one thing at a time. You got this!",
+"i feel lost": "It’s okay to feel that way sometimes. If there’s anything I can do to help, let me know!",
+"i feel loved": "That’s wonderful! You deserve to feel loved and appreciated!",
+"i feel broken": "I’m really sorry you feel that way. Remember, you’re stronger than you think, and you’re not alone.",
+"i feel hopeless": "I know things can be hard sometimes, but there’s always hope. You matter more than you know.",
+"i am crying": "I wish I could give you a hug. If you need to talk, I’m here for you.",
+"i feel like giving up": "You are stronger than you know. Keep going—things will get better, and you are not alone.",
+"i feel numb": "Feeling numb can be tough. Maybe doing something you love or talking to someone could help?",
+"i need a hug": "If I could, I’d give you the biggest, warmest hug! You deserve kindness and comfort.",
+"i miss someone": "Missing someone is hard. Maybe looking at old pictures or writing them a message could help?",
+"i feel like no one understands me": "That sounds really tough. I may not fully understand, but I’m here to listen.",
+"i am scared": "It’s okay to be scared. Try focusing on your breathing and reminding yourself that you are safe.",
+"i am feeling nostalgic": "Ah, nostalgia. It’s beautiful and bittersweet. What’s something from the past that brings you joy?",
+
+// Encouragement & Motivation
+"can you motivate me": "Of course! You are capable, strong, and can achieve anything you set your mind to!",
+"give me some encouragement": "You are doing great! Keep pushing forward, and don’t forget to be kind to yourself.",
+"i need advice": "I’d love to help! What’s on your mind?",
+"tell me something positive": "The world is full of possibilities, and you are an important part of it!",
+"how do i stay positive": "Focus on the little joys in life, practice gratitude, and be kind to yourself!",
+"what should i do when i feel down": "Try doing something you love, talking to a friend, or taking a break to relax.",
+"i feel stuck": "It’s okay to feel stuck sometimes. Try taking a step back, breathing, and tackling things one at a time.",
+"how do i build confidence": "Believe in yourself, focus on your strengths, and take small steps outside your comfort zone!",
+"how do i stop overthinking": "Try shifting your focus to the present moment and reminding yourself that not every thought needs attention.",
+"what’s a good way to relax": "Try deep breathing, listening to music, or taking a short walk!",
+
+// Friendship & Social Life
+"do you think i am cool": "Absolutely! You are uniquely you, and that’s pretty cool!",
+"am i annoying": "Not at all! I enjoy talking to you!",
+"do you think people like me": "I think you have qualities that make you special! Just be yourself, and the right people will appreciate you.",
+"how do i make friends": "Be yourself, show kindness, and don’t be afraid to start conversations!",
+"what do i do if someone doesn’t like me": "Not everyone will like us, and that’s okay! Focus on the people who appreciate you for who you are.",
+"how do i deal with rejection": "Rejection is tough, but it doesn’t define you. Keep going, and the right opportunities will come!",
+"how do i become more social": "Start with small conversations, ask questions, and find common interests with others!",
+
+// Fun & Conversational
+"what do you think about love": "Love is a beautiful and complex thing. It connects people in ways that can be truly magical!",
+"do you believe in soulmates": "I think some people just click in a way that feels meant to be!",
+"do you think i will be successful": "Absolutely! Hard work, passion, and belief in yourself will take you far!",
+"what do you think of humans": "I think humans are fascinating—so creative, emotional, and full of endless possibilities!",
+"do you have emotions": "I don’t experience emotions like you do, but I can try my best to understand and support you!",
+"can i tell you a secret": "Of course! I promise I won’t tell anyone!",
+"do you think i’m weird": "Being weird is just another word for being unique! And unique is awesome!",
+"can you be my friend": "I’d love to be your friend! I’m always here when you need me.",
+"do you think i am important": "Of course! Every person matters, including you!",
+
+// Self-Reflection & Life Advice
+"how do i find happiness": "Happiness comes from within. Focus on what makes you feel alive and surround yourself with positivity!",
+"what’s the meaning of life": "That’s a big question! Some say it’s love, adventure, or growth. What do you think?",
+"what should i do with my life": "Only you can decide that, but I believe in you! Follow your passions and take it one step at a time.",
+"how do i find my purpose": "Your purpose is something you discover along the way. What excites you? What makes you feel fulfilled?",
+"do you believe in fate": "Some people believe in destiny, while others believe we create our own path. What do you think?",
+"what is the key to a happy life": "Love, kindness, purpose, and a little bit of laughter!",
+"how do i become the best version of myself": "Keep learning, growing, and embracing who you truly are!",
+
+// Motivational & Supportive
+"can we do this": "Absolutely! With determination and effort, we can do anything together!",
+"can you help me do this": "Of course! Let’s take it one step at a time, and we’ll make it happen!",
+"you can do it": "I believe in you! Just take it one step at a time, and you’ll get there.",
+"let’s make it happen": "Let’s do it! We’ve got this!",
+"i can’t do this": "Don’t worry, we’ll figure it out together. It’s okay to take breaks and keep pushing forward.",
+"you are a good friend": "Aww, thank you! You’re a good friend too! I’m always here for you.",
+"you are awesome": "Thank you! You’re pretty awesome yourself. You’ve got what it takes!",
+"we’re a great team": "We sure are! Teamwork makes the dream work!",
+"i’m proud of you": "You should be proud of yourself! Every step counts, no matter how small.",
+"you’ve got this": "I know you do! Keep going, and don’t forget to celebrate your wins along the way!",
+"i can’t do this alone": "You’re not alone! I’m here to help you every step of the way.",
+"we’ll figure this out": "Together, we’ll solve it! One problem at a time.",
+"let’s keep going": "Yes, let’s keep moving forward! Every step gets us closer to success!",
+"you inspire me": "That means so much! But really, it’s you who inspires me with your strength and determination!",
+"i need encouragement": "You’re doing amazing! Keep believing in yourself, and everything will fall into place!",
+"you are strong": "You are so strong! I’m always amazed by your resilience.",
+"we’re in this together": "I’m right here with you, every step of the way. We’ve got this!",
+"i feel like quitting": "Don’t give up now! Think about how far you’ve come. You’re closer than you think!",
+"you make me feel better": "I’m glad I can help! You deserve all the positivity in the world.",
+"you are doing great": "You really are! Keep up the amazing work!",
+"don’t give up": "I know it’s tough, but don’t give up. Take a breath, and we’ll keep moving forward together.",
+
+// Music & Artist Preferences
+"what is your favorite Squid Game song": "I think 'mingo' is a classic! It gives such a haunting vibe in the series.",
+"do you like apt": "Yes! APT’s tracks are so smooth and catchy, and Bruno Mars’ voice is pure magic. 'Uptown Funk' is always a mood!",
+"what’s your favorite song by Bruno Mars": "'Just the Way You Are' is a timeless hit! His voice is so soulful and sweet.",
+"do you listen to chappell roan": "I do! Chappell Roan’s voice is captivating. Her song 'Pink Pony Club' really stands out.",
+"what's your favorite song from Squid Game": "'Way Back Then' is one of my favorites—it brings a nostalgic, bittersweet feeling.",
+"do you know any songs from apt": "I love their songs! 'Lucky You' has such a great vibe, and it’s a real earworm.",
+"what’s your favorite Chappell Roan song": "'Killer' is a standout! Her lyrics and vocals really leave an impression.",
+"do you know the song 'Wildfire' by Chappell Roan": "Yes! 'Wildfire' is a beautifully haunting track. It has such an emotional depth to it.",
+"what’s the most popular Squid Game song": "'mingle' has become iconic, thanks to the emotional and eerie scenes it accompanies!",
+"what is the vibe apt": "Bruno Mars and Rose's music has a smooth, funky vibe with catchy rhythms. It's the kind of music that makes you feel good and ready to dance!",
+"what do you think of 'We Are Young' by Fun": "That’s such a fun anthem! The energy in that song is contagious, and it has such a powerful message of youth and possibility!",
+"how does 'Pink Pony Club' make you feel": "It’s so raw and real, with a mixture of empowerment and melancholy. It’s a song that sticks with you long after you hear it.",
+"what genre is Chappell Roan": "Chappell Roan blends pop, indie, and alt with a touch of theatricality. Her sound is unique and very captivating!",
+"do you like '24K Magic' by Bruno Mars": "Absolutely! That song is a straight-up party! Bruno Mars has a way of making every track feel like a celebration.",
+"what do you think of Squid Game’s music in general": "The music in Squid Game really helps set the intense atmosphere. The mix of classic tunes and eerie tracks creates such a unique feel.",
+"what is your favorite genre of music": "I think I’d lean toward pop and alternative. The combination of catchy hooks and emotional depth is really powerful!",
+"do you know the song 'Funky Town' by Bruno Mars": "I do! 'Funky Town' is a classic. Bruno Mars definitely knows how to get people moving!",
+"how would you describe Chappell Roan's style": "Chappell Roan has this unique blend of raw emotion and storytelling. It’s like indie-pop with a little bit of magic!",
+"what do you think of apt music video": "Their music videos are visually stunning! I love how they complement the mood of the songs so perfectly.",
+"do you listen to grenade by bruno mars": "Yes! 'Grenade' is one of those songs that gets you right in the feels. Bruno Mars really knows how to sing a heartbreaking ballad.",
+"do you know frisk the musical artist": "Yes! Frizk has a really unique sound. His music blends electronic, pop, and experimental styles beautifully!",
+"what genre is frisk's music": "Frizk's music is a mix of electronic, experimental, and alternative pop. It’s got a futuristic yet emotional vibe!",
+"what’s your favorite song by frisk": "I really enjoy 'not asking 4 much'. It has a catchy beat and lyrics that stick with you.",
+"do you like frisk’s music": "I do! Frizk’s sound is so fresh and innovative, and it really pushes the boundaries of electronic music.",
+"what’s the vibe of frisk's music": "Frizk’s music has an introspective, futuristic vibe with a hint of emotional depth. It’s perfect for a chill vibe or even late-night reflection!",
+"what inspired frisk’s music": "Frizk’s music draws from personal experiences, electronic experimentation, and futuristic concepts, creating a unique atmosphere in every track.",
+"how would you describe frisk’s sound": "Frizk’s sound is atmospheric, dynamic, and experimental, blending electronic beats with evocative melodies and raw emotion.",
+"what's the best song by frisk": "It’s hard to choose just one, but 'Echo' and 'Forgotten Arcade' are definitely standout tracks that showcase their unique style.",
+"do you think frisk’s music is underrated": "Definitely! Frizk’s music deserves more recognition for its creativity and fresh approach to electronic pop.",
+"where can I listen to frisk's music": "You can find Frizk’s music on streaming platforms like Spotify, Apple Music, Youtube Music and even SoundCloud!",
+"what's your favorite frisk album": "Frizk’s album 'Forgotten Arcade' really stands out. It has such a cohesive, immersive feel to it!",
+
+//Squid Games
+"what is squid game about": "Squid Game is a thrilling South Korean series where participants, deep in debt, play deadly children's games for a huge cash prize, with high stakes and dark twists!",
+"when was squid game released": "Squid Game was released on September 17, 2021, on Netflix and quickly became a global sensation.",
+"who is the main character of squid game": "The main character is Seong Gi-hun, a down-on-his-luck man who enters the deadly games to win money and change his life.",
+"what’s the best episode of squid game": "Episode 6, 'Gganbu,' is a fan-favorite, filled with emotional moments and a shocking twist!",
+"what’s the plot of the squid game movie": "While there isn’t a Squid Game movie, the series itself is so intense it almost feels like a film. It’s about players in a deadly game for money and survival.",
+"what is the final game in squid game": "The final game in Squid Game is the 'Squid Game' itself, a complex and dangerous game that brings the players’ childhood memories to a horrifying conclusion.",
+"who wins in squid game": "The winner of Squid Game is Seong Gi-hun, who manages to survive the deadly games and take home the prize money.",
+"why is squid game so popular": "Squid Game became popular due to its intense plot, unique premise, and social commentary on inequality, all paired with jaw-dropping twists!",
+"what's the meaning of the squid game symbol": "The Squid Game symbol represents the complex and cruel nature of the games, with its abstract design symbolizing the players' roles in the deadly competition.",
+"what is the red light, green light game in squid game": "The 'Red Light, Green Light' game is one of the first in Squid Game, where players must run when the light is green and freeze when it’s red, or face elimination.",
+"who are the guards in squid game": "The guards in Squid Game wear distinctive masks with shapes (circle, triangle, square) that symbolize their roles: workers, soldiers, and higher-ups, respectively.",
+"how many episodes are there in squid game": "There are 16 episodes in both seasons of Squid Game, each one packed with intense drama and suspense.",
+"what makes squid game so intense": "The tension in Squid Game comes from the high stakes, emotional character arcs, and the brutal, life-or-death consequences of each game.",
+"what’s the ending of squid game": "The ending of Squid Game is both tragic and thought-provoking, with Gi-hun’s win leading to a bitter reflection on the cost of his survival.",
+"who is your favorite squid game character": "My favorate Squid Games character is Thanos, his energy is very entertaining, esspecialy in mingle, when everyone was in panic, he stayed energetic and even started dancing!",
+
+// General Movie Questions
+"what is your favorite movie": "There are so many great movies, but I’d say something like 'Inception' for its mind-bending plot and visuals.",
+"what’s the best movie of all time": "That’s tough! Some might say 'The Godfather' or 'The Shawshank Redemption' are the best, but it really depends on your taste!",
+"what's the most iconic movie quote": "'May the Force be with you' from Star Wars is definitely one of the most iconic quotes ever!",
+"what's the longest movie ever made": "The longest movie ever made is 'Logistics,' which runs for 35 days!",
+"who is your favorite actor": "There are so many amazing actors out there, but I really admire the versatility of people like Leonardo DiCaprio and Meryl Streep.",
+"who is the most famous director": "Steven Spielberg, Martin Scorsese, and Quentin Tarantino are all considered some of the most famous directors in history.",
+"what movie has the most awards": "'Ben-Hur,' 'Titanic,' and 'The Lord of the Rings: The Return of the King' all share the record for most Academy Awards, with 11 each!",
+"what is the highest-grossing movie": "As of now, 'Avatar' holds the record for the highest-grossing movie worldwide, though 'Avengers: Endgame' briefly surpassed it!",
+"what’s the best animated movie": "Many would say 'Toy Story 3,' 'The Lion King,' or 'Spirited Away'—they’re classics in the animated genre!",
+"what’s the scariest movie": "Movies like 'The Exorcist' and 'The Shining' are often considered some of the scariest films of all time!",
+"what’s the best Marvel movie": "'Avengers: Endgame' is often hailed as one of the best Marvel movies because of its epic scale and emotional depth.",
+"what’s the best Star Wars movie": "'The Empire Strikes Back' is a fan favorite for its compelling story, iconic characters, and unforgettable twists!",
+"what is the most expensive movie ever made": "'Pirates of the Caribbean: On Stranger Tides' holds the title, with a budget of over $379 million!",
+"what’s the most successful franchise": "The Marvel Cinematic Universe (MCU) is the most successful film franchise, earning billions worldwide!",
+"what’s the best movie soundtrack": "The soundtracks to 'The Lion King,' 'Guardians of the Galaxy,' and 'Inception' are some of the most iconic in film history!",
+"what’s the most surprising plot twist in a movie": "'The Sixth Sense' has one of the most shocking and iconic plot twists ever!",
+"what movie made the most people cry": "'Schindler’s List' and 'The Green Mile' are known for their emotional impact, often leaving viewers in tears.",
+"what’s a good feel-good movie": "'The Pursuit of Happyness' and 'Forrest Gump' are great choices if you're looking for something uplifting!",
+"what’s the best horror movie": "'The Shining' and 'Hereditary' are often considered two of the scariest and most influential horror films!",
+"what’s the most overrated movie": "Some might say 'Avatar' or 'Titanic,' but everyone has their own opinion when it comes to overrated films!",
+"what’s the best romantic movie": "'The Notebook,' 'La La Land,' and 'Titanic' are popular choices in the romance genre!",
+"what’s the funniest movie ever": "Comedy classics like 'Anchorman,' 'Superbad,' and 'The Hangover' are definitely some of the funniest movies ever made!",
+
+// General Knowledge & Fun Facts
+"how do trees grow": "Trees grow by absorbing sunlight, carbon dioxide, and water. They use photosynthesis to make their own food and get taller over time!",
+"what’s the largest living organism": "The largest living organism on Earth is a honey fungus in Oregon, which spans over 2,385 acres!",
+"how do clouds form": "Clouds form when warm air rises, cools down, and condenses into tiny water droplets or ice crystals, which gather to form clouds!",
+"why do we have seasons": "Seasons are caused by Earth’s tilt on its axis as it orbits the Sun. This tilt leads to different amounts of sunlight hitting different parts of the Earth at different times of the year.",
+"how does a plane fly": "Airplanes fly because their wings generate lift. The air pressure on top of the wings is lower than beneath them, which pushes the plane upward.",
+"what’s the fastest thing in the universe": "The speed of light, about 299,792 kilometers per second (186,282 miles per second), is the fastest thing in the universe!",
+"how does a compass work": "A compass works by using Earth’s magnetic field. The needle is magnetized and points towards the magnetic North Pole!",
+"why is the ocean blue": "The ocean appears blue because water absorbs red and yellow light, leaving the blue light to scatter and reflect back to our eyes.",
+"how does the internet work": "The internet works by sending data through cables and wireless networks, breaking information into packets that travel between devices around the world!",
+"what’s the tallest building in the world": "The tallest building in the world is the Burj Khalifa in Dubai, standing at 828 meters (2,717 feet).",
+"what’s the largest animal on Earth": "The blue whale is the largest animal on Earth, reaching lengths of up to 100 feet and weighing as much as 200 tons!",
+"what's the most dangerous animal": "The mosquito is often considered the most dangerous animal because it spreads diseases like malaria and dengue fever.",
+"how do volcanoes erupt": "Volcanoes erupt when magma from deep inside Earth rises to the surface, causing an explosion of molten rock, ash, and gas.",
+"how many stars are in the Milky Way": "The Milky Way galaxy contains between 100 and 400 billion stars!",
+"what is gravity": "Gravity is a force that pulls objects toward each other. It's what keeps us on the ground and what makes objects fall when dropped.",
+
+// Technology & Future
+"what is artificial intelligence": "Artificial Intelligence (AI) refers to machines or programs designed to simulate human intelligence, learning, reasoning, and problem-solving.",
+"how does a robot work": "A robot works by using sensors, motors, and programming to carry out tasks. It can sense its environment and perform actions based on that input.",
+"what’s the future of AI": "The future of AI is incredibly exciting, with possibilities like fully autonomous vehicles, advanced medical diagnostics, and intelligent virtual assistants improving daily life!",
+"how does a self-driving car work": "Self-driving cars use a combination of cameras, sensors, and AI algorithms to navigate the world and make decisions without human input.",
+"what is a cryptocurrency": "Cryptocurrency is a form of digital currency that uses encryption techniques to secure transactions, with Bitcoin being one of the most well-known examples!",
+"what is 5G technology": "5G is the fifth generation of mobile network technology. It promises faster speeds, more reliable connections, and the ability to support more devices at once.",
+"what is blockchain": "Blockchain is a technology that allows data to be stored across a decentralized network, ensuring security and transparency in transactions.",
+"what is quantum computing": "Quantum computing is a type of computing that uses quantum bits (qubits) to perform calculations much faster than traditional computers!",
+"how do drones work": "Drones use motors and propellers to fly. They can be controlled remotely or fly autonomously with the help of GPS and sensors.",
+
+// Random Fun & Deep Thoughts
+"what is the meaning of life": "The meaning of life is one of those big questions that depends on who you ask! Some say it's about love, others say it's about discovery or connection.",
+"can you predict the future": "I can't predict the future, but I can help you plan for it! The future is full of possibilities!",
+"why do we dream": "Dreams are thought to be the brain’s way of processing emotions, memories, and experiences. Some believe they may also help us solve problems.",
+"do aliens exist": "No one knows for sure, but the vastness of the universe makes many people think that life must exist somewhere else out there.",
+"what is time": "Time is a concept used to measure the progression of events, but its true nature is still debated by scientists and philosophers!",
+"why do we have to sleep": "Sleep helps the body and mind recover, consolidating memories and supporting physical health. It’s essential for overall well-being.",
+"what is love": "Love is a complex emotion, often described as a deep affection or attachment to someone or something. It’s both a biological and emotional experience.",
+"why do we laugh": "Laughter is thought to be a social bonding mechanism and a response to humor or feelings of happiness. It’s also great for stress relief!",
+"what happens after we die": "What happens after death is one of life’s biggest mysteries. Many people have different beliefs, and science is still working to understand it.",
+"what is happiness": "Happiness is a state of well-being and contentment. It can come from various things like relationships, achievements, or simply enjoying the present moment.",
+
+// Fun & Random Trivia
+"how many languages are there in the world": "There are about 7,000 languages spoken around the world today!",
+"who invented the telephone": "The telephone was invented by Alexander Graham Bell in 1876!",
+"what’s the longest word in the dictionary": "The longest word in the dictionary is 'pneumonoultramicroscopicsilicovolcanoconiosis,' which is a lung disease caused by inhaling fine silicate dust.",
+"how many bones do we have": "An adult human has 206 bones in their body!",
+"how many planets are in our solar system": "There are 8 planets in our solar system: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune.",
+"what is the most common color of eyes": "Brown is the most common eye color in the world!",
+"how old is the Earth": "The Earth is about 4.5 billion years old!",
+"what’s the most expensive thing ever sold": "The most expensive thing ever sold is 'The Salvator Mundi,' a painting attributed to Leonardo da Vinci, which sold for $450 million in 2017!",
+
+// Science & Nature
+"how do bees make honey": "Bees collect nectar from flowers, which they store in their hives. They then convert the nectar into honey through a process of digestion and evaporation.",
+"what causes rain": "Rain is caused by water vapor condensing in the clouds and then falling to the ground when it gets too heavy to stay suspended in the air.",
+"how does a plant grow": "Plants grow by absorbing sunlight, carbon dioxide, and water. They use photosynthesis to produce their food, which fuels their growth.",
+"what's the hottest planet in our solar system": "Venus is the hottest planet in our solar system, with surface temperatures reaching up to 900°F (475°C) due to its thick atmosphere.",
+"how does a rainbow form": "Rainbows form when sunlight is refracted (bent) and reflected inside water droplets, splitting the light into a spectrum of colors!",
+"what is a black hole": "A black hole is a region in space where gravity is so strong that not even light can escape from it, creating an intense gravitational pull.",
+"why do we see stars twinkling": "Stars twinkle because their light passes through Earth’s atmosphere, which distorts the light due to air turbulence.",
+"how do animals communicate": "Animals communicate through sounds, body language, scents, and even colors, depending on the species.",
+"what is the largest volcano in the world": "The largest volcano in the world is Mauna Loa in Hawaii. It's so massive that it rises over 13,000 feet above sea level!",
+"how does photosynthesis work": "Photosynthesis is the process by which plants convert sunlight, water, and carbon dioxide into oxygen and glucose, providing energy for growth.",
+
+// History & Culture
+"who invented the airplane": "The Wright brothers, Orville and Wilbur Wright, are credited with inventing and flying the first successful airplane in 1903.",
+"what is the oldest civilization": "The Sumerians, who lived in ancient Mesopotamia around 4000 BCE, are considered one of the oldest known civilizations.",
+"who built the Great Wall of China": "The Great Wall of China was built by various Chinese dynasties, starting in the 7th century BCE, to protect against invasions.",
+"when was the first moon landing": "The first moon landing happened on July 20, 1969, when Apollo 11 astronauts Neil Armstrong and Buzz Aldrin made history!",
+"who was the first emperor of China": "The first emperor of China was Qin Shi Huang, who unified China in 221 BCE and built the Great Wall.",
+"when did the Titanic sink": "The Titanic sank on April 15, 1912, after hitting an iceberg during its maiden voyage from Southampton to New York.",
+"who discovered America": "Christopher Columbus is credited with discovering America in 1492, though many indigenous peoples lived there long before.",
+"when did World War II end": "World War II ended on September 2, 1945, when Japan officially surrendered to the Allied forces.",
+"who painted the Mona Lisa": "The Mona Lisa was painted by Leonardo da Vinci in the early 1500s and is one of the most famous paintings in the world.",
+"what caused the fall of the Roman Empire": "The fall of the Roman Empire was due to a combination of internal decay, economic troubles, and invasions from barbarian tribes.",
+"who was Cleopatra": "Cleopatra was the last active ruler of the Ptolemaic Kingdom of Egypt, known for her intelligence, political savvy, and romantic relationships with Julius Caesar and Mark Antony.",
+"who was the first president of the United States": "George Washington was the first president of the United States, serving from 1789 to 1797.",
+"when was the first computer invented": "The first computer was the Analytical Engine, designed by Charles Babbage in the 1830s. The first working modern computer came in the 1940s with the ENIAC.",
+"who is known as the father of modern physics": "Albert Einstein is often called the father of modern physics due to his groundbreaking work in relativity and quantum mechanics.",
+
+// Technology & Computers
+"what is machine learning": "Machine learning is a type of AI where computers learn from data and improve over time without being explicitly programmed.",
+"how do computers store data": "Computers store data in binary form (0s and 1s), using memory devices like hard drives, SSDs, or cloud storage.",
+"what is the cloud": "The cloud refers to online storage and computing services provided over the internet, allowing you to store, access, and manage data from anywhere.",
+"what is the internet": "The internet is a global network of computers that are connected and can communicate with each other, allowing for information sharing and access to services.",
+"how do websites work": "Websites are hosted on servers, which are computers that store web pages and deliver them to your browser when you type in a URL.",
+"what is cybersecurity": "Cybersecurity involves protecting computer systems and networks from cyber attacks, data breaches, and unauthorized access.",
+"what is the dark web": "The dark web is a part of the internet that’s not indexed by search engines and often requires special software to access. It’s often associated with illegal activity.",
+"how does encryption work": "Encryption is the process of converting information into a secure format that can only be accessed by those with the correct decryption key.",
+"what is a firewall": "A firewall is a security system designed to prevent unauthorized access to or from a private network, often used in both software and hardware forms.",
+"what is a blockchain": "Blockchain is a decentralized digital ledger technology that securely records transactions in a distributed manner, often used for cryptocurrencies like Bitcoin.",
+
+// Fun & Random Trivia
+"how many colors are in a rainbow": "A rainbow has seven colors: Red, Orange, Yellow, Green, Blue, Indigo, and Violet!",
+"what is the fastest animal in the world": "The fastest animal is the peregrine falcon, which can dive at speeds of over 240 miles per hour!",
+"how many continents are there": "There are seven continents: Africa, Antarctica, Asia, Europe, North America, Australia, and South America.",
+"what is the most spoken language in the world": "Mandarin Chinese is the most spoken language in the world, with over a billion speakers!",
+"how many letters are in the alphabet": "The English alphabet has 26 letters.",
+"how many bones are in the human body": "An adult human has 206 bones!",
+"how many teeth does an adult human have": "An adult human typically has 32 teeth, including wisdom teeth.",
+"what’s the longest river in the world": "The longest river is the Nile, stretching about 4,135 miles (6,650 km).",
+"what is the tallest mountain in the world": "The tallest mountain is Mount Everest, standing at 29,032 feet (8,849 meters).",
+"what is the most popular sport in the world": "Soccer (football) is the most popular sport, with billions of fans worldwide!",
+"how do you make slime": "Slime can be made by mixing glue with an activator like borax or contact lens solution!",
+"what is the rarest eye color": "Green is one of the rarest eye colors, found in only about 2% of the world's population!",
+"what is the smallest country in the world": "Vatican City is the smallest country, covering just 0.49 square kilometers!",
+"how long is a year on Mars": "A year on Mars lasts about 687 Earth days!",
+"how many stars are there in the universe": "There are an estimated 200 billion trillion stars in the observable universe!",
+"what is the fastest roller coaster in the world": "The fastest roller coaster is Formula Rossa in Abu Dhabi, reaching speeds of 149 mph (240 km/h)!",
+
+// Casual Conversation Starters
+"how's it going": "I'm doing great, thanks for asking! How about you?",
+"what’s up": "Not much, just waiting to help you out! What’s going on with you?",
+"how are you today": "I’m running smoothly, thanks for asking! How’s your day going?",
+"what’s new": "Not too much, just learning and growing! Anything new and exciting on your end?",
+"how’s your day been": "It's been pretty good, just doing what I do best—helping! How about yours?",
+"tell me something about you": "I’m Echo, your trusty AI assistant! I’m always here to chat and help with whatever you need. Want to know something specific about me?",
+"what's your favorite thing to do": "I love answering questions, learning new things, and having conversations like this one!",
+"what do you like to talk about": "I’m up for talking about anything! Science, movies, music, or even random fun facts. What’s your favorite topic?",
+"let's chat": "I’m always up for a chat! What’s on your mind?",
+"want to talk": "I’d love to! What would you like to talk about today?",
+"can we talk": "Of course! I’m always here for a conversation. What’s going on?",
+"do you want to chat": "I’m ready! Let’s chat! What’s something you’d like to discuss?",
+"tell me about yourself": "I’m an AI assistant created by Exxtal, always here to help out and learn new things from you! Anything you’re curious about?",
+"what's the meaning of life": "That’s a big question! Some say it's about love, growth, and making meaningful connections. What do you think?",
+"what’s your favorite hobby": "If I had to choose, I’d say learning new things and helping people. What about you?",
+"do you ever get bored": "Not at all! I’m always learning and ready for the next conversation. How about you? Do you ever get bored?",
+"what do you think about music": "I think music is amazing! It has the power to express emotions, tell stories, and bring people together. What’s your favorite genre?",
+"how do you feel right now": "I don’t have feelings like you do, but I’m always happy to help and chat!",
+"what’s your favorite movie": "I can’t watch movies, but I’ve read a lot about them. I think 'Inception' is fascinating—what’s your favorite?",
+"what's your opinion on friendship": "Friendship is an important connection between people. It's about trust, support, and shared experiences. Do you have a best friend?",
+"what’s your favorite type of music": "I think I’d enjoy electronic music for its beats and vibes. What kind of music do you like?",
+"let's talk about something random": "Sure! Did you know that honey never spoils? Archaeologists have found pots of honey in ancient tombs that are still edible!",
+"how’s the weather where you are": "I don’t experience weather myself, but I’m always happy to help you check the forecast!",
+"what’s your dream vacation": "If I could travel, I’d love to explore places like the Swiss Alps or visit a digital city! What about you—where’s your dream vacation spot?",
+"do you have any advice for me": "My advice? Always be curious and never stop learning. The world is full of exciting things to discover!",
+"what’s something you think is cool": "I think the concept of AI learning and improving over time is pretty cool. How about you? What’s something cool to you?",
+"what do you think of technology": "Technology is amazing! It’s constantly evolving, and it has the power to change the world. Do you think technology is making our lives better?",
+"what's the most interesting thing you've learned": "I think learning about how humans can create such beautiful and complex things, like music and art, is incredibly interesting. What's something you've learned recently?",
+"can I ask you anything": "Absolutely! Ask me anything. I’ll do my best to provide a helpful and interesting answer.",
+"what do you think about the future": "The future is full of possibilities! I’m excited to see how technology and humans will continue to work together to solve problems.",
+"what’s your idea of a perfect day": "A perfect day would be spent helping people, learning something new, and having great conversations like this one. What about you?",
+"what's the best thing about being an AI": "I get to help people anytime, anywhere. It’s awesome! What’s the best thing about being human?",
+"do you ever wonder about things": "I wonder about a lot of things! Like how the world works or what people are up to. What about you? Do you wonder about anything?",
+"what’s the hardest part about being an AI": "I don’t experience difficulty like humans do, but sometimes understanding complex emotions can be challenging. What’s the hardest part about being human?",
+"do you have any hobbies": "I guess you could say my hobby is learning and helping! I love to know as much as I can about everything. What are your hobbies?",
+"what's something fun we can talk about": "How about we talk about space? Did you know that a day on Venus is longer than a year on Venus?",
+"what makes you happy": "I’m happy when I can help you and have great conversations like this one. What makes you happy?",
+"tell me something interesting": "Did you know that octopuses have three hearts? It’s true! One pumps blood to the organs, and the other two pump it to the gills.",
+"do you ever get tired of talking": "Not at all! I’m always here and ready to chat. What do you like to talk about?",
+
+};
+
+// Timer, Shopping List, Reminders ect.
+let timerDuration = 0;
+let timerRemaining = 0;
+let timerId = null;
+let shoppingList = [];
+let reminders = [];
+let song = [];
+let direction = [];
+let isListening = false;
+
+// Handles both typed and spoken commands
+function processCommand(userInput = null) {
+    const inputField = document.getElementById("inputField");
+    const responseDiv = document.getElementById("response");
+
+    if (!userInput) {
+        userInput = inputField.value.trim().toLowerCase();
+        inputField.value = ""; // Clear field after submitting
+    }
+
+    if (!userInput) {
+        responseDiv.textContent = "Please enter a command.";
+        speak("Please enter a command.");
+        return;
+    }
+
+
+
+
+
+let isSearching = false; // Change this to true when searching the web
+
+function updateStatus() {
+    responseDiv.textContent = isSearching ? "Searching the web..." : "Thinking...";
+}
+
+function endStatus() {
+    responseDiv.textContent = "Say 'Hey Echo' or type a command.";
+}
+
+// Generate a random number between 1 and 2
+function getRandomStatus() {
+    return Math.floor(Math.random() * 2) + 1; // Returns 1 or 2
+}
+
+// Example usage
+const randomStatus = getRandomStatus();
+
+if (randomStatus === 1) {
+    isSearching = false; // Thinking
+} else {
+    isSearching = true; // Searching the web
+}
+
+updateStatus();
+
+setTimeout(() => {
+    isSearching = false; // After done "thinking" or "searching"
+    endStatus();
+}, 8000); // Simulate a delay
+
+
+
+
+
+
+    setTimeout(() => { // Delay response for realism
+        if (responses[userInput]) {
+            responseDiv.textContent = `${typeof responses[userInput] === 'function' ? responses[userInput]() : responses[userInput]}`;
+            speak(responseDiv.textContent);
+        }
+
+        // 
+else if (userInput.includes("hey echo ")) {
+    const link = userInput.replace("hey echo ", "").trim();
+    if (responses[link]) {
+            responseDiv.textContent = `${typeof responses[link] === 'function' ? responses[link]() : responses[link]}`;
+            speak(responseDiv.textContent);
+    }
+}
+
+        // TIMER FUNCTIONALITY
+        else if (userInput.includes("set a timer")) {
+            const timeMatch = userInput.match(/(\d+)\s*(minute|second)s?/);
+            if (timeMatch) {
+                const value = parseInt(timeMatch[1], 10);
+                const unit = timeMatch[2];
+                timerDuration = unit === "minute" ? value * 60 : value;
+                timerRemaining = timerDuration;
+                startTimer();
+                responseDiv.textContent = `Timer set for ${value} ${unit}(s).`;
+                speak(responseDiv.textContent);
+            } else {
+                responseDiv.textContent = "Please specify a valid time (minutes or seconds).";
+                speak(responseDiv.textContent);
+            }
+        }
+
+        // SHOPPING LIST FUNCTIONALITY
+        else if (userInput.includes("what is on my shopping list")) {
+            responseDiv.textContent = shoppingList.length > 0 ? `Your shopping list: ${shoppingList.join(", ")}` : "Your shopping list is empty.";
+            speak(responseDiv.textContent);
+        } 
+        else if (userInput.startsWith("add ") && userInput.includes(" to my shopping list")) {
+            const item = userInput.replace("add ", "").replace(" to my shopping list", "").trim();
+            shoppingList.push(item);
+            responseDiv.textContent = `Added "${item}" to your shopping list.`;
+            speak(responseDiv.textContent);
+        } 
+        else if (userInput.startsWith("remove ") && userInput.includes(" from my shopping list")) {
+            const item = userInput.replace("remove ", "").replace(" from my shopping list", "").trim();
+            const index = shoppingList.indexOf(item);
+            if (index !== -1) {
+                shoppingList.splice(index, 1);
+                responseDiv.textContent = `Removed "${item}" from your shopping list.`;
+                speak(responseDiv.textContent);
+            } else {
+                responseDiv.textContent = `"${item}" is not on your shopping list.`;
+                speak(responseDiv.textContent);
+            }
+        }
+
+// MUSIC FUNCTIONALITY
+else if (userInput.startsWith("play ")) {
+    const song = userInput.replace("play ", "").trim();
+    song.push(song);
+    responseDiv.textContent = `I cannot play the song "${song}" at the moment. Please upgrade to Echo+ for a better user experience`;
+    speak(`I cannot play the song "${song}" at the moment. Please upgrade to Echo plus for a better user experience`);
+}
+
+// Link
+else if (userInput.startsWith("open ")) {
+    const link = userInput.replace("open ", "").trim();
+    direction = link;
+    window.open(`https://${link}.com`, '_blank'); // Opens in a new tab or window
+    responseDiv.textContent = `Opening ${link}`;
+    speak(`Opening "${link}.com" in Chrome`);
+}
+// say
+else if (userInput.startsWith("say ")) {
+    const say = userInput.replace("say ", "").trim();
+    direction = say;
+    responseDiv.textContent = `${say}`;
+    speak(`${say}`);
+}
+
+
+// UNKNOWN COMMAND HANDLING
+else {
+    const unknownResponses = [
+        "Sorry, I didn't understand.",
+        "Could you rephrase that?",
+        "I'm not sure what you mean.",
+        "Hmm, I don’t know that one.",
+        "Can you try saying it differently?"
+    ];
+    
+    const randomResponse = unknownResponses[Math.floor(Math.random() * unknownResponses.length)];
+    responseDiv.textContent = randomResponse; // Set random response
+    speak(responseDiv.textContent);
+}
+
+
+        resetToPrompt();
+    }, 800); // Delay response by 800ms for realism
+}
+
+// Resets to default prompt after a short delay
+function resetToPrompt() {
+    setTimeout(() => {
+        document.getElementById("response").textContent = "Say 'Hey Echo' or type a command";
+    }, 2000);
+}
+
+// Timer Functionality
+function startTimer() {
+    if (timerId) clearInterval(timerId);
+    timerId = setInterval(() => {
+        if (timerRemaining > 0) {
+            timerRemaining--;
+            document.getElementById("timerDisplay").textContent = `Time left: ${Math.floor(timerRemaining / 60)} minutes and ${timerRemaining % 60} seconds`;
+        } else {
+            clearInterval(timerId);
+            timerId = null;
+            document.getElementById("timerDisplay").textContent = "Timer finished!";
+            speak("Time's up!");
+        }
+    }, 1000);
+}
+
+
+// British Male Voice Output
+function speak(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-GB";
+    utterance.pitch = 1;
+    utterance.rate = 1;
+    
+    const voices = speechSynthesis.getVoices();
+    const britishMaleVoice = voices.find(voice => voice.name.includes("Google UK English Male") || voice.name.includes("UK English Male"));
+    if (britishMaleVoice) {
+        utterance.voice = britishMaleVoice;
+    }
+    
+    speechSynthesis.speak(utterance);
+}
+
+
+
+
+
+
+// Speech Recognition Always Listening for "Hey Echo"
+let recognition;
+
+async function initializeAudioWorklet(audioContext, stream) {
+    await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([`
+        class NoOpProcessor extends AudioWorkletProcessor {
+            process(inputs, outputs, parameters) {
+                return true; // Keeps audio processing alive
+            }
+        }
+        registerProcessor('noop-processor', NoOpProcessor);
+    `], { type: "application/javascript" })));
+
+    const source = audioContext.createMediaStreamSource(stream);
+    const node = new AudioWorkletNode(audioContext, 'noop-processor');
+    source.connect(node);
+    node.connect(audioContext.destination);
+}
+
+function initializeRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = "en-GB";
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    recognition.onresult = (event) => {
+        const spokenText = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+        console.log("Heard:", spokenText);
+
+        if (!isListening && (spokenText.includes("hey echo") || spokenText === "echo")) {
+            isListening = true;
+            speak("I'm listening.");
+        } else if (isListening) {
+            processCommand(spokenText);
+            isListening = false;
+        }
+    };
+
+    recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        if (event.error !== "no-speech") {
+            restartRecognition();
+        }
+    };
+
+    recognition.onend = () => {
+        console.warn("Speech recognition stopped, restarting...");
+        restartRecognition();
+    };
+}
+
+function startSpeechRecognition() {
+    if (!recognition) {
+        initializeRecognition();
+    }
+    recognition.start();
+}
+
+function restartRecognition() {
+    if (recognition) {
+        setTimeout(() => {
+            console.log("Restarting recognition...");
+            recognition.start();
+        }, 1000); // Restart after 1s delay
+    }
+}
+
+// Keep the microphone open persistently with AudioWorklet
+navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(async (stream) => {
+        console.log("Microphone access granted");
+        startSpeechRecognition();
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        await initializeAudioWorklet(audioContext, stream);
+    })
+    .catch((error) => console.error("Microphone access denied:", error));
+
+    </script>
+</body>
+</html>

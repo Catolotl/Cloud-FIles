@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f9;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4C4C4C;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .controls input, .controls select, .controls button {
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+        .controls input[type="text"], .controls input[type="date"], .controls select {
+            max-width: 300px;
+        }
+        .controls button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .controls button:hover {
+            background-color: #0056b3;
+        }
+        #searchInput {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        .task-list {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        .task-item {
+            background-color: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+        .task-item:hover {
+            background-color: #f9f9f9;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #999;
+        }
+        .overdue {
+            background-color: #ffe6e6;
+        }
+        .priority-high {
+            border-left: 8px solid #e74c3c;
+        }
+        .priority-medium {
+            border-left: 8px solid #f39c12;
+        }
+        .priority-low {
+            border-left: 8px solid #2ecc71;
+        }
+        .task-details {
+            flex-grow: 1;
+            margin-right: 20px;
+        }
+        .task-actions button {
+            margin-left: 10px;
+        }
+        .task-actions button:first-child {
+            background-color: #28a745;
+        }
+        .task-actions button:first-child:hover {
+            background-color: #218838;
+        }
+        .task-actions button:nth-child(2) {
+            background-color: #dc3545;
+        }
+        .task-actions button:nth-child(2):hover {
+            background-color: #c82333;
+        }
+        .task-actions button:nth-child(3) {
+            background-color: #ffc107;
+        }
+        .task-actions button:nth-child(3):hover {
+            background-color: #e0a800;
+        }
+        .notes-section {
+            margin-top: 10px;
+            display: none;
+        }
+        .notes-section textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            resize: vertical;
+        }
+        .notes-toggle {
+            margin-top: 10px;
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        .notes-toggle:hover {
+            background-color: #e67e22;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Echo Task Manager</h1>
+
+        <!-- Search Bar -->
+        <input type="text" id="searchInput" placeholder="Search tasks" oninput="filterTasks()" />
+
+        <!-- Controls: Add Task Form -->
+        <div class="controls">
+            <input type="text" id="taskInput" placeholder="Enter task" />
+            <input type="date" id="dueDateInput" />
+            <select id="priorityInput">
+                <option value="high">High Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="low">Low Priority</option>
+            </select>
+            <input type="text" id="categoryInput" placeholder="Enter category" />
+            <button onclick="addTask()">Add Task</button>
+        </div>
+
+        <!-- Task List -->
+        <ul id="taskList" class="task-list"></ul>
+    </div>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+        // Load tasks from local storage
+        window.onload = function() {
+            renderTasks();
+        }
+
+        // Add task
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const dueDateInput = document.getElementById('dueDateInput');
+            const priorityInput = document.getElementById('priorityInput');
+            const categoryInput = document.getElementById('categoryInput');
+            
+            const task = {
+                id: Date.now(),
+                name: taskInput.value,
+                dueDate: dueDateInput.value,
+                priority: priorityInput.value,
+                category: categoryInput.value,
+                completed: false,
+                notes: '' // Initialize notes as empty
+            };
+            
+            tasks.push(task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+            
+            taskInput.value = '';
+            dueDateInput.value = '';
+            categoryInput.value = '';
+        }
+
+        // Render tasks
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            tasks.forEach(task => {
+                const taskItem = document.createElement('li');
+                taskItem.classList.add('task-item');
+
+                // Check if task is overdue
+                const isOverdue = new Date(task.dueDate) < new Date() && !task.completed;
+
+                // Add priority class
+                const priorityClass = `priority-${task.priority}`;
+
+                taskItem.innerHTML = `
+                    <div class="task-details ${isOverdue ? 'overdue' : ''} ${task.completed ? 'completed' : ''} ${priorityClass}">
+                        <span>${task.name}</span>
+                        <span>${task.dueDate}</span>
+                        <span>${task.category}</span>
+                    </div>
+                    <div class="task-actions">
+                        <button onclick="toggleComplete(${task.id})">Complete</button>
+                        <button onclick="deleteTask(${task.id})">Delete</button>
+                        <button onclick="editTask(${task.id})">Edit</button>
+                        <button class="notes-toggle" onclick="toggleNotes(${task.id})">Add/Edit Notes</button>
+                    </div>
+                    <div id="notes-${task.id}" class="notes-section">
+                        <textarea placeholder="Add your notes here" oninput="updateNotes(${task.id}, this.value)">${task.notes}</textarea>
+                    </div>
+                `;
+
+                taskList.appendChild(taskItem);
+            });
+        }
+
+        // Toggle task completion
+        function toggleComplete(taskId) {
+            tasks = tasks.map(task => task.id === taskId ? { ...task, completed: !task.completed } : task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        // Delete task
+        function deleteTask(taskId) {
+            tasks = tasks.filter(task => task.id !== taskId);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        // Edit task
+        function editTask(taskId) {
+            const task = tasks.find(task => task.id === taskId);
+            document.getElementById('taskInput').value = task.name;
+            document.getElementById('dueDateInput').value = task.dueDate;
+            document.getElementById('priorityInput').value = task.priority;
+            document.getElementById('categoryInput').value = task.category;
+
+            deleteTask(taskId);
+        }
+
+        // Filter tasks by search term
+        function filterTasks() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredTasks = tasks.filter(task => task.name.toLowerCase().includes(searchTerm));
+            renderFilteredTasks(filteredTasks);
+        }
+
+        // Render filtered tasks
+        function renderFilteredTasks(filteredTasks) {
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            filteredTasks.forEach(task => {
+                const taskItem = document.createElement('li');
+                taskItem.classList.add('task-item');
+
+                // Check if task is overdue
+                const isOverdue = new Date(task.dueDate) < new Date() && !task.completed;
+
+                // Add priority class
+                const priorityClass = `priority-${task.priority}`;
+
+                taskItem.innerHTML = `
+                    <div class="task-details ${isOverdue ? 'overdue' : ''} ${task.completed ? 'completed' : ''} ${priorityClass}">
+                        <span>${task.name}</span>
+                        <span>${task.dueDate}</span>
+                        <span>${task.category}</span>
+                    </div>
+                    <div class="task-actions">
+                        <button onclick="toggleComplete(${task.id})">Complete</button>
+                        <button onclick="deleteTask(${task.id})">Delete</button>
+                        <button onclick="editTask(${task.id})">Edit</button>
+                        <button class="notes-toggle" onclick="toggleNotes(${task.id})">Add/Edit Notes</button>
+                    </div>
+                    <div id="notes-${task.id}" class="notes-section">
+                        <textarea placeholder="Add your notes here" oninput="updateNotes(${task.id}, this.value)">${task.notes}</textarea>
+                    </div>
+                `;
+
+                taskList.appendChild(taskItem);
+            });
+        }
+
+        // Toggle visibility of notes section
+        function toggleNotes(taskId) {
+            const notesSection = document.getElementById(`notes-${taskId}`);
+            notesSection.style.display = notesSection.style.display === 'none' || !notesSection.style.display ? 'block' : 'none';
+        }
+
+        // Update notes for a task
+        function updateNotes(taskId, notes) {
+            tasks = tasks.map(task => task.id === taskId ? { ...task, notes } : task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+    </script>
+</body>
+</html>
