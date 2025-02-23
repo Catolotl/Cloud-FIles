@@ -782,6 +782,18 @@ else if (userInput.startsWith("say ")) {
     speak(`${say}`);
 }
 
+  //time
+  else if (userInput.includes("what is the best time to go to ")) {
+  var times = [
+  "The best time to head out today is 12:30 PM",
+  "The best time to head out today is 2:30 PM",
+  "The best time to get going is 1:45 PM",
+  "A good time to make your way out of the house is 6:30 PM",
+];
+    var q = times[ Math.floor( Math.random() * times
+    responseDiv.textContent = `${q}`;
+    speak(`${q}`);
+  }
 
 // UNKNOWN COMMAND HANDLING
 else {
