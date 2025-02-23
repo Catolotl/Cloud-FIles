@@ -783,7 +783,7 @@ else if (userInput.startsWith("say ")) {
 }
 
 // time
-else if (userInput.includes("best time to ")) {
+else if (userInput.includes("what is the best time ")) {
   var times = [
     "The best time to head out today is 12:30 PM",
     "The best time to head out today is 2:30 PM",
@@ -803,7 +803,8 @@ else {
         "Could you rephrase that?",
         "I'm not sure what you mean.",
         "Hmm, I don’t know that one.",
-        "Can you try saying it differently?"
+        "Can you try saying it differently?",
+        "Excuse me, could you say that again?"
     ];
     
     const randomResponse = unknownResponses[Math.floor(Math.random() * unknownResponses.length)];
